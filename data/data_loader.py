@@ -52,15 +52,15 @@ class DataLoader(object):
     def download_file_from_id(self, id: str, file_name: str):
         self.__download_file(download_url % id, file_name)
 
-    def get_name_list_from(self, c: str, pid: int=1):
+    def get_name_list_from(self, c: str, pid: int = 1):
         url = song_by_name % (c, pid)
         return self.get_name_list_from_url(url, False)
-    
+
     def get_name_list_from_all(self, pid: int):
         url = all_song_url % pid
         return self.get_name_list_from_url(url)
 
-    def get_artist_letters_from_url(self, url: str, letter: str=None, any: bool=True):
+    def get_artist_letters_from_url(self, url: str, letter: str = None, any: bool = True):
         self.set_soup(url)
         artist_letter_list = self.__soup.find_all('a', class_='artist_letter')
         letter_list = []
@@ -82,7 +82,7 @@ class DataLoader(object):
             letter_list.append(values)
         return letter_list
 
-    def get_name_list_from_url(self, url: str, any: bool=True, next: bool=True, page: int=1):
+    def get_name_list_from_url(self, url: str, any: bool = True, next: bool = True, page: int = 1):
         self.set_soup(url)
         artist_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         artist_list = []
@@ -97,7 +97,7 @@ class DataLoader(object):
             artist_list.append(values)
 
         if next:
-            next_pages = self.__soup.find(class_ = 'bottom_navigation_bar').find_all(class_ = 'bnav_button')
+            next_pages = self.__soup.find(class_='bottom_navigation_bar').find_all(class_='bnav_button')
 
             for next_page in next_pages:
                 next_page_url = base_letter_url + next_page.get('href')
@@ -111,39 +111,36 @@ class DataLoader(object):
                 for next_page_name in next_page_artist_list:
                     artist_list.append(next_page_name)
 
-
         return artist_list
 
-    def get_songs_list_from_url(self, url: str, artist: str, any: bool=True, next: bool=True, page: int=1):
-            self.set_soup(url)
-            songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
-            songs_list = []
-            for i, song in enumerate(songs_name_list):
-                print('Song Name: ', song.text)
-                values = {
-                    'page': int(page),
-                    'index': int(i + 1),
-                    'artist': artist,
-                    'song': song.text,
-                    'url': base_url + song.get('href').split('/', 1)[-1]
-                }
-                songs_list.append(values)
+    def get_songs_list_from_url(self, url: str, artist: str, any: bool = True, next: bool = True, page: int = 1):
+        self.set_soup(url)
+        songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
+        songs_list = []
+        for i, song in enumerate(songs_name_list):
+            print('Song Name: ', song.text)
+            values = {
+                'page': int(page),
+                'index': int(i + 1),
+                'artist': artist,
+                'song': song.text,
+                'url': base_url + song.get('href').split('/', 1)[-1]
+            }
+            songs_list.append(values)
 
-            if next:
-                next_pages = self.__soup.find(class_ = 'bottom_navigation_bar').find_all(class_ = 'bnav_button')
+        if next:
+            next_pages = self.__soup.find(class_='bottom_navigation_bar').find_all(class_='bnav_button')
 
-                for next_page in next_pages:
-                    next_page_url = base_artist_url + next_page.get('href')
+            for next_page in next_pages:
+                next_page_url = base_artist_url + next_page.get('href')
 
-                    if next_page.text.lower() == 'previous' or next_page.text.lower() == 'next':
-                        continue
+                if next_page.text.lower() == 'previous' or next_page.text.lower() == 'next':
+                    continue
 
-                    next_page_no = int(next_page.text)
-                    next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, True, False, next_page_no)
+                next_page_no = int(next_page.text)
+                next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, True, False, next_page_no)
 
-                    for next_page_name in next_page_songs_list:
-                        songs_list.append(next_page_name)
+                for next_page_name in next_page_songs_list:
+                    songs_list.append(next_page_name)
 
-
-            return songs_list
-
+        return songs_list

@@ -53,7 +53,8 @@ class Interface(object):
             self.__page_id = 1
             name_list, page_info = self.__data_loader.get_name_list_from(cmd, self.__page_id)
         name_list, page_info = item_list
-        print('\n'.join(['%d) %s [downloads: %d]' % (item['index'], item['name'], item['count']) for item in name_list]))
+        print(
+            '\n'.join(['%d) %s [downloads: %d]' % (item['index'], item['name'], item['count']) for item in name_list]))
         print(page_info)
         print('\nEnter nn to goto next page. pp to previous page. id<num> to goto page given by <num>.')
         print('To select a song type sel<num> to download the song given by <num> in the list')
@@ -120,12 +121,11 @@ class Interface(object):
             if matches:
                 letter = arg.lower()
 
-
         if letter is not None:
-             print("Letter based: ", letter.upper()
+            print("Letter based: ", letter.upper())
         else:
-             print("Input is not correct")
-             return
+            print("Input is not correct")
+            return
 
         if count_lim == 0:
             print("Downloading all songs..")
@@ -143,7 +143,7 @@ class Interface(object):
                 artist_name_list = self.__data_loader.get_name_list_from_url(letter['url'])
 
                 for artist_name in artist_name_list:
-                   artist_list.append(artist_name)
+                    artist_list.append(artist_name)
 
         songs_list = []
         for artist in artist_list:
@@ -155,10 +155,11 @@ class Interface(object):
                     songs_list.append(song_name)
 
         print(songs_list)
-#             if item['count'] > count_lim:
-#                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
-#                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
-                
+
+    #             if item['count'] > count_lim:
+    #                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
+    #                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
+
     def __artist_all_download(self, cmd: str):
         print("All Artist download")
 
@@ -190,8 +191,7 @@ class Interface(object):
                 artist_name_list = self.__data_loader.get_name_list_from_url(letter['url'])
 
                 for artist_name in artist_name_list:
-                   artist_list.append(artist_name)
-
+                    artist_list.append(artist_name)
 
         songs_list = []
         for artist in artist_list:
@@ -203,10 +203,10 @@ class Interface(object):
                     songs_list.append(song_name)
 
         print(songs_list)
-#             if item['count'] > count_lim:
-#                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
-#                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
-        
+
+    #             if item['count'] > count_lim:
+    #                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
+    #                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()
