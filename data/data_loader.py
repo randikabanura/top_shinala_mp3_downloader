@@ -90,7 +90,7 @@ class DataLoader(object):
             print('Artist Name: ', artist.text)
             values = {
                 'page': int(page),
-                'index': int(i + 1),
+                'index': (25 * int(page - 1)) + int(i + 1),
                 'name': artist.text,
                 'url': base_url + artist.get('href').split('/', 1)[-1]
             }

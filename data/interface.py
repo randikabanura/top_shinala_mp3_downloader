@@ -12,12 +12,13 @@ class Interface(object):
         self.__state = NO_STATE
         self.__cmds = []
         self.__page_id = 1
+        self.__artist_name_letter = None
 
     def __print_initial_msg(self, cmd='none'):
         print("Welcome to Top Sinhala MP3 Downloader..\nEnter your commands below...\n")
         print("Anytime, if you want to go back enter 99 and if you want to start from the beginning enter 999..")
         print("Also you can exit the software by typing quit...")
-        print("Do you need to search by:\n\t1) Artist Letter \n\t2) All Artists")
+        print("Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) All Artists")
         print("Please enter a number below")
         self.__state = INITIAL_STATE
 
@@ -37,6 +38,9 @@ class Interface(object):
             print("Enter the first letter of the Artists")
             self.__state = ARTIST_LETTER
         elif cmd in '2)':
+            print("Enter the first letter of the Artists")
+            self.__state = ARTIST_NAME_ENTERED
+        elif cmd in '3)':
             print("Enter the first letter of the name of the artist")
             self.__state = ALL_DOWNLOAD
         else:
@@ -67,39 +71,40 @@ class Interface(object):
         else:
             self.__handle_back(cmd, self.__search)
 
-    def __name_results(self, cmd: str):
-        show_result = True
-        if cmd == 'nn':
-            self.__cmds.pop()
-            cmd = self.__cmds[-1]
-            self.__page_id += 1
-        elif cmd == 'pp':
-            self.__cmds.pop()
-            cmd = self.__cmds[-1]
-            self.__page_id -= 1
-            if self.__page_id < 1:
-                self.__page_id = 1
-        elif cmd.startswith('id'):
-            try:
-                self.__page_id = int(cmd[2:])
-            except:
-                print("Cannot identify a ID given. Going back to the beginning..")
-                self.__page_id = 1
-            self.__cmds.pop()
-            cmd = self.__cmds[-1]
-        elif cmd.startswith('sel'):
-            pass
-        else:
-            show_result = False
-            self.__handle_back(cmd, self.__search)
-        if show_result:
-            self.__show_results_name(cmd)
-
     def __custom_search(self, cmd: str):
         if cmd is not None and cmd != '':
             self.__state = ARTIST_LETTER
         else:
             self.__handle_back(cmd, self.__search)
+
+    def __artist_name_results(self, cmd: str):
+        print("Artist Name based show results")
+        args = cmd.split()
+        url = full_letter_url
+        args = args[0:]
+        letter = None
+        for arg in args:
+            matches = re.match(artist_letter_based_regex, arg, re.MULTILINE)
+            if matches:
+                letter = arg.lower()
+
+        if letter is not None:
+            print("Letter based: ", letter.upper())
+        else:
+            print("Input is not correct. Letter:", letter)
+            return
+
+        self.__artist_name_letter = letter
+
+        artist_list = self.__get_artists(url, letter)
+        if artist_list is None:
+            return
+
+        print("Select a number for the Artist")
+        for artist in artist_list:
+            print("{}) {}".format(artist['index'], artist['name']))
+
+        self.__state = ARTIST_NAME
 
     def __artist_letter_based(self, cmd: str):
         print("Artist Letter based download")
@@ -124,26 +129,15 @@ class Interface(object):
         if letter is not None:
             print("Letter based: ", letter.upper())
         else:
-            print("Input is not correct")
+            print("Input is not correct. Letter:", letter)
             return
 
         if count_lim == 0:
             print("Downloading all songs..")
 
-        letter_list = self.__data_loader.get_artist_letters_from_url(url, letter)
-
-        if letter_list is None:
-            print('Some Error')
+        artist_list = self.__get_artists(url, letter)
+        if artist_list is None:
             return
-
-        artist_list = []
-        for letter in letter_list:
-            if letter['url'] is not None and letter['url'].split('#')[0] not in full_letter_url:
-                print('Getting Artists from Letter: ', letter['name'], 'URL: ', letter['url'])
-                artist_name_list = self.__data_loader.get_name_list_from_url(letter['url'])
-
-                for artist_name in artist_name_list:
-                    artist_list.append(artist_name)
 
         songs_list = []
         for artist in artist_list:
@@ -178,20 +172,9 @@ class Interface(object):
             print("Downloading all songs..")
             print("Under Letter:")
 
-        letter_list = self.__data_loader.get_artist_letters_from_url(url)
-
-        if letter_list is None:
-            print('Some Error')
+        artist_list = self.__get_artists(url)
+        if artist_list is None:
             return
-
-        artist_list = []
-        for letter in letter_list:
-            if letter['url'] is not None and letter['url'].split('#')[0] not in full_letter_url:
-                print('Getting Artists from Letter: ', letter['name'], 'URL: ', letter['url'])
-                artist_name_list = self.__data_loader.get_name_list_from_url(letter['url'])
-
-                for artist_name in artist_name_list:
-                    artist_list.append(artist_name)
 
         songs_list = []
         for artist in artist_list:
@@ -204,9 +187,84 @@ class Interface(object):
 
         print(songs_list)
 
-    #             if item['count'] > count_lim:
-    #                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
-    #                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
+        #             if item['count'] > count_lim:
+        #                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
+        #                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
+
+    def __artist_name_based(self, cmd: str):
+        print("Artist Name based download")
+
+        letter = self.__artist_name_letter
+        args = cmd.split()
+        url = full_letter_url
+        args = args[0:]
+        count_lim = 0
+        artist_index = args[0]
+
+        for arg in args:
+            if arg.startswith('d'):
+                try:
+                    count_lim = int(arg[1:])
+                except:
+                    print('error number format. Try again as d<num>')
+                    return
+
+        if artist_index is None:
+            print("Input is not correct. Number:", artist_index)
+            self.__artist_name_letter = None
+            return
+        else:
+            artist_index = int(artist_index)
+
+        if letter is not None:
+            matches = re.match(artist_letter_based_regex, letter, re.MULTILINE)
+            if matches:
+                letter = letter
+            else:
+                print("Input is not correct. Letter:", letter)
+                self.__artist_name_letter = None
+                return
+
+            print("Letter based: ", letter.upper())
+        else:
+            print("Input is not correct. Letter:", letter)
+            self.__artist_name_letter = None
+            return
+
+        artist_list = self.__get_artists(url, letter)
+        if artist_list is None:
+            return
+
+        songs_list = []
+        for artist in artist_list:
+            if artist['url'] is not None and artist['name'] is not None and artist['index'] == artist_index:
+                print('Getting Songs from Artist: ', artist['name'], 'URL: ', artist['url'])
+                songs_name_list = self.__data_loader.get_songs_list_from_url(artist['url'], artist['name'])
+
+                for song_name in songs_name_list:
+                    songs_list.append(song_name)
+
+        print(songs_list)
+
+        self.__artist_name_letter = None
+
+    def __get_artists(self, url: str, letter: str = None):
+        letter_list = self.__data_loader.get_artist_letters_from_url(url, letter)
+
+        if letter_list is None:
+            print('Some Letter List Error')
+            return
+
+        artist_list = []
+        for letter in letter_list:
+            if letter['url'] is not None and letter['url'].split('#')[0] not in full_letter_url:
+                print('Getting Artists from Letter: ', letter['name'], 'URL: ', letter['url'])
+                artist_name_list = self.__data_loader.get_name_list_from_url(letter['url'])
+
+                for artist_name in artist_name_list:
+                    artist_list.append(artist_name)
+
+        return artist_list
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()
@@ -218,12 +276,14 @@ class Interface(object):
             self.__search(cmd)
         elif self.__state == SEARCH_SONG_BY_NAME:
             self.__name_c_entered(cmd)
-        elif self.__state == NAME_CHR_ENTERED:
-            self.__name_results(cmd)
+        elif self.__state == ARTIST_NAME_ENTERED:
+            self.__artist_name_results(cmd)
         elif self.__state == SEARCH_CUSTOM:
             self.__custom_search(cmd)
         elif self.__state == ARTIST_LETTER:
             self.__artist_letter_based(cmd)
+        elif self.__state == ARTIST_NAME:
+            self.__artist_name_based(cmd)
         elif self.__state == ALL_DOWNLOAD:
             self.__artist_all_download(cmd)
 
