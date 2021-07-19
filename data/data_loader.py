@@ -64,8 +64,6 @@ class DataLoader(object):
 
         self.__download_file(source_link, name + '.mp3')
 
-    # self.__download_file(download_url % id, file_name)
-
     def get_artist_letters_from_url(self, url: str, letter: str = None, any: bool = True):
         self.set_soup(url)
         artist_letter_list = self.__soup.find_all('a', class_='artist_letter')
