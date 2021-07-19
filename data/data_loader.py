@@ -38,7 +38,7 @@ class DataLoader(object):
         try:
             print("Request URL: ", url)
             response = urllib2.urlopen(url)
-            with open(name + '.mp3', 'wb') as out_file:
+            with open(name, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
 
             print("Successfully download Song: ", name)
@@ -62,7 +62,7 @@ class DataLoader(object):
 
         source_link = source.get('data-src')
 
-        self.__download_file(source_link, name)
+        self.__download_file(source_link, name + '.mp3')
 
     # self.__download_file(download_url % id, file_name)
 
