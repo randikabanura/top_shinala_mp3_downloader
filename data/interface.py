@@ -148,11 +148,7 @@ class Interface(object):
                 for song_name in songs_name_list:
                     songs_list.append(song_name)
 
-        print(songs_list)
-
-    #             if item['count'] > count_lim:
-    #                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
-    #                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
+        self.__download_songs(songs_list)
 
     def __artist_all_download(self, cmd: str):
         print("All Artist download")
@@ -185,11 +181,7 @@ class Interface(object):
                 for song_name in songs_name_list:
                     songs_list.append(song_name)
 
-        print(songs_list)
-
-        #             if item['count'] > count_lim:
-        #                 print("downloading item: '%s' with %d downloads" % (item['name'], item['count']))
-        #                 self.__data_loader.download_file_from_id(item['id'], '%s.mp3' % item['name'])
+        self.__download_songs(songs_list)
 
     def __artist_name_based(self, cmd: str):
         print("Artist Name based download")
@@ -244,7 +236,7 @@ class Interface(object):
                 for song_name in songs_name_list:
                     songs_list.append(song_name)
 
-        print(songs_list)
+        self.__download_songs(songs_list)
 
         self.__artist_name_letter = None
 
@@ -265,6 +257,16 @@ class Interface(object):
                     artist_list.append(artist_name)
 
         return artist_list
+
+    def __download_songs(self, song_list: list = []):
+        for song in song_list:
+            song_artist = song['artist']
+            song_url = song['url']
+            song_name = song['song']
+
+            print("Song download: Artist:", song_artist, "Song:", song_name)
+            if song_url is not None:
+                self.__data_loader.download_file_from_url(song_url, song_name)
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()

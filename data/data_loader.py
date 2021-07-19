@@ -31,14 +31,17 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def __download_file(self, url: str, file_name: str):
-        file_name = '%s/%s' % (self.__download_dir, file_name)
-        if os.path.isfile(file_name):
+    def __download_file(self, url: str, name: str):
+        if os.path.isfile(name):
             print("File already there.. Going to next :)")
             return
         try:
-            with urllib2.urlopen(url) as response, open(file_name, 'wb') as out_file:
+            print("Request URL: ", url)
+            response = urllib2.urlopen(url)
+            with open(name + '.mp3', 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
+
+            print("Successfully download Song: ", name)
         except URLError as e:
             if hasattr(e, 'reason'):
                 print('We failed to reach a server.')
@@ -46,19 +49,22 @@ class DataLoader(object):
             elif hasattr(e, 'code'):
                 print('The server couldn\'t fulfill the request.')
                 print('Error code: ', e.code)
-        except IOError as e:
-            print("Error while accessing file\nReason:", e.strerror)
+        except Exception as e:
+            print("Error Occurred. Reason:\n", e)
 
-    def download_file_from_id(self, id: str, file_name: str):
-        self.__download_file(download_url % id, file_name)
+    def download_file_from_url(self, url: str, name: str):
+        self.set_soup(url)
+        source = self.__soup.find('div', id='tsmp3-player').find(class_='player-source')
 
-    def get_name_list_from(self, c: str, pid: int = 1):
-        url = song_by_name % (c, pid)
-        return self.get_name_list_from_url(url, False)
+        if source is None or source.get('data-src') is None or source.get('data-src') == '#':
+            print('Source URL: ', source, 'does not have a valid  url')
+            return
 
-    def get_name_list_from_all(self, pid: int):
-        url = all_song_url % pid
-        return self.get_name_list_from_url(url)
+        source_link = source.get('data-src')
+
+        self.__download_file(source_link, name)
+
+    # self.__download_file(download_url % id, file_name)
 
     def get_artist_letters_from_url(self, url: str, letter: str = None, any: bool = True):
         self.set_soup(url)
