@@ -15,6 +15,8 @@ class Interface(object):
         self.__artist_name_letter = None
 
     def __print_initial_msg(self, cmd='none'):
+        print("")
+        print("===================================================================")
         print("Welcome to Top Sinhala MP3 Downloader..\nEnter your commands below...\n")
         print("Anytime, if you want to go back enter 99 and if you want to start from the beginning enter 999..")
         print("Also you can exit the software by typing quit...")
