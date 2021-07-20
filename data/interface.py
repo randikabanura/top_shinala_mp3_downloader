@@ -31,6 +31,7 @@ class Interface(object):
         elif cmd == '99':
             func(self.__cmds.pop())
         else:
+            print("State: ", self.__state)
             print('Invalid character (%s). Please try again' % cmd)
 
     def __search(self, cmd: str):
@@ -141,6 +142,7 @@ class Interface(object):
                     songs_list.append(song_name)
 
         self.__download_songs(songs_list)
+        self.__handle_back('999', self.__print_initial_msg)
 
     def __artist_all_download(self, cmd: str):
         print("All Artist download")
@@ -174,6 +176,7 @@ class Interface(object):
                     songs_list.append(song_name)
 
         self.__download_songs(songs_list)
+        self.__handle_back('999', self.__print_initial_msg)
 
     def __artist_name_based(self, cmd: str):
         print("Artist Name based download")
@@ -231,6 +234,7 @@ class Interface(object):
         self.__download_songs(songs_list)
 
         self.__artist_name_letter = None
+        self.__handle_back('999', self.__print_initial_msg)
 
     def __get_artists(self, url: str, letter: str = None):
         letter_list = self.__data_loader.get_artist_letters_from_url(url, letter)
