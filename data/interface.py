@@ -95,7 +95,7 @@ class Interface(object):
 
         print("Select a number for the Artist")
         for artist in artist_list:
-            print("{}) {}".format(artist['index'], artist['name']))
+            print("{}) {} {}".format(artist['index'], artist['name'], artist['no_of_songs']))
 
         self.__state = ARTIST_NAME
 
@@ -160,7 +160,6 @@ class Interface(object):
                     return
         if count_lim == 0:
             print("Downloading all songs..")
-            print("Under Letter:")
 
         artist_list = self.__get_artists(url)
         if artist_list is None:

@@ -91,7 +91,7 @@ class DataLoader(object):
             letter_list.append(values)
         return letter_list
 
-    def get_name_list_from_url(self, url: str, any: bool = True, next: bool = True, page: int = 1):
+    def get_name_list_from_url(self, url: str, any: bool = True, get_next_page: bool = True, page: int = 1):
         self.set_soup(url)
         artist_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         artist_list = []
@@ -101,11 +101,12 @@ class DataLoader(object):
                 'page': int(page),
                 'index': (artists_per_page * int(page - 1)) + int(i + 1),
                 'name': artist.text,
-                'url': base_url + artist.get('href').split('/', 1)[-1]
+                'url': base_url + artist.get('href').split('/', 1)[-1],
+                'no_of_songs': artist.next_sibling.next_sibling.text or ''
             }
             artist_list.append(values)
 
-        if next:
+        if get_next_page:
             next_pages = self.__soup.find(class_='bottom_navigation_bar').find_all(class_='bnav_button')
 
             for next_page in next_pages:
