@@ -31,7 +31,7 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def __download_file(self, url: str, directory: str,  name: str):
+    def __download_file(self, url: str, directory: str, name: str):
         if os.path.isfile(name):
             print("File already there.. Going to next :)")
             return
