@@ -8,7 +8,7 @@ import re
 class Interface(object):
 
     def __init__(self):
-        self.__data_loader = DataLoader('./downloads')
+        self.__data_loader = DataLoader(file_download_path)
         self.__state = NO_STATE
         self.__cmds = []
         self.__page_id = 1
@@ -266,7 +266,7 @@ class Interface(object):
 
             print("Song download: Artist:", song_artist, "Song:", song_name)
             if song_url is not None:
-                self.__data_loader.download_file_from_url(song_url, song_name)
+                self.__data_loader.download_file_from_url(song_url, song_name, song_artist)
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()

@@ -9,3 +9,6 @@ song_page_heading = 'Sinhala MP3 Songs'
 download_url = 'http://www.ananmanan.lk/free-sinhala-mp3/download.php?id=%d'
 all_song_url = 'http://www.ananmanan.lk/free-sinhala-mp3/page/%d'
 artist_letter_based_regex = r"^[a-zA-Z]{1}$"
+artists_per_page = 25
+songs_per_page = 50
+file_download_path = './downloads'

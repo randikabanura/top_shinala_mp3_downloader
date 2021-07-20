@@ -31,10 +31,14 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def __download_file(self, url: str, name: str):
+    def __download_file(self, url: str, directory: str,  name: str):
         if os.path.isfile(name):
             print("File already there.. Going to next :)")
             return
+        else:
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
         try:
             print("Request URL: ", url)
             response = urllib2.urlopen(url)
@@ -52,7 +56,7 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def download_file_from_url(self, url: str, name: str):
+    def download_file_from_url(self, url: str, name: str, artist: str):
         self.set_soup(url)
         source = self.__soup.find('div', id='tsmp3-player').find(class_='player-source')
 
@@ -61,8 +65,9 @@ class DataLoader(object):
             return
 
         source_link = source.get('data-src')
-
-        self.__download_file(source_link, name + '.mp3')
+        directory = "{}/{}".format(self.__download_dir, artist)
+        file_name = "{}/{}{}".format(directory, name, '.mp3')
+        self.__download_file(source_link, directory, file_name)
 
     def get_artist_letters_from_url(self, url: str, letter: str = None, any: bool = True):
         self.set_soup(url)
@@ -94,7 +99,7 @@ class DataLoader(object):
             print('Artist Name: ', artist.text)
             values = {
                 'page': int(page),
-                'index': (25 * int(page - 1)) + int(i + 1),
+                'index': (artists_per_page * int(page - 1)) + int(i + 1),
                 'name': artist.text,
                 'url': base_url + artist.get('href').split('/', 1)[-1]
             }
@@ -125,7 +130,7 @@ class DataLoader(object):
             print('Song Name: ', song.text)
             values = {
                 'page': int(page),
-                'index': int(i + 1),
+                'index': (songs_per_page * int(page - 1)) + int(i + 1),
                 'artist': artist,
                 'song': song.text,
                 'url': base_url + song.get('href').split('/', 1)[-1]
