@@ -134,14 +134,7 @@ class Interface(object):
         if artist_list is None:
             return
 
-        songs_list = []
-        for artist in artist_list:
-            if artist['url'] is not None and artist['name'] is not None:
-                print('Getting Songs from Artist: ', artist['name'], 'URL: ', artist['url'])
-                songs_name_list = self.__data_loader.get_songs_list_from_url(artist['url'], artist['name'])
-
-                for song_name in songs_name_list:
-                    songs_list.append(song_name)
+        songs_list = self.__get_songs(artist_list)
 
         self.__download_songs(songs_list)
         self.__handle_back('999', self.__print_initial_msg)
@@ -167,14 +160,7 @@ class Interface(object):
         if artist_list is None:
             return
 
-        songs_list = []
-        for artist in artist_list:
-            if artist['url'] is not None and artist['name'] is not None:
-                print('Getting Songs from Artist: ', artist['name'], 'URL: ', artist['url'])
-                songs_name_list = self.__data_loader.get_songs_list_from_url(artist['url'], artist['name'])
-
-                for song_name in songs_name_list:
-                    songs_list.append(song_name)
+        songs_list = self.__get_songs(artist_list)
 
         self.__download_songs(songs_list)
         self.__handle_back('999', self.__print_initial_msg)
@@ -223,14 +209,7 @@ class Interface(object):
         if artist_list is None:
             return
 
-        songs_list = []
-        for artist in artist_list:
-            if artist['url'] is not None and artist['name'] is not None and artist['index'] == artist_index:
-                print('Getting Songs from Artist: ', artist['name'], 'URL: ', artist['url'])
-                songs_name_list = self.__data_loader.get_songs_list_from_url(artist['url'], artist['name'])
-
-                for song_name in songs_name_list:
-                    songs_list.append(song_name)
+        songs_list = self.__get_songs(artist_list, True, artist_index)
 
         self.__download_songs(songs_list)
 
@@ -254,6 +233,18 @@ class Interface(object):
                     artist_list.append(artist_name)
 
         return artist_list
+
+    def __get_songs(self, artist_list: list = [], one_artist: bool = False, artist_index: int = None):
+        songs_list = []
+        for artist in artist_list:
+            if artist['url'] is not None and artist['name'] is not None and (not one_artist or artist['index'] == artist_index):
+                print('Getting Songs from Artist: ', artist['name'], 'URL: ', artist['url'])
+                songs_name_list = self.__data_loader.get_songs_list_from_url(artist['url'], artist['name'])
+
+                for song_name in songs_name_list:
+                    songs_list.append(song_name)
+
+        return songs_list
 
     def __download_songs(self, song_list: list = []):
         for song in song_list:
