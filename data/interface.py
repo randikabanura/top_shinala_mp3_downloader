@@ -63,14 +63,6 @@ class Interface(object):
         print('\nEnter nn to goto next page. pp to previous page. id<num> to goto page given by <num>.')
         print('To select a song type sel<num> to download the song given by <num> in the list')
 
-    def __name_c_entered(self, cmd: str):
-        if cmd in first_chrs:
-            self.__page_id = 1
-            self.__state = NAME_CHR_ENTERED
-            self.__show_results_name(cmd)
-        else:
-            self.__handle_back(cmd, self.__search)
-
     def __custom_search(self, cmd: str):
         if cmd is not None and cmd != '':
             self.__state = ARTIST_LETTER
@@ -276,8 +268,6 @@ class Interface(object):
             self.__print_initial_msg()
         elif self.__state == INITIAL_STATE:
             self.__search(cmd)
-        elif self.__state == SEARCH_SONG_BY_NAME:
-            self.__name_c_entered(cmd)
         elif self.__state == ARTIST_NAME_ENTERED:
             self.__artist_name_results(cmd)
         elif self.__state == SEARCH_CUSTOM:
