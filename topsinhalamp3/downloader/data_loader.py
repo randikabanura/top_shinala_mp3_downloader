@@ -6,6 +6,7 @@ import shutil
 from urllib.error import URLError
 import os
 import eyed3
+from pkg_resources import resource_stream
 
 
 class DataLoader(object):
@@ -191,7 +192,9 @@ class DataLoader(object):
             song_file.tag.title = song_values['song_name']
             song_file.tag.album = song_values['artist_description']
             song_file.tag.comments.set(song_values['artist_description'])
+
             song_file.tag.images.remove('AlbumArt')
-            song_file.tag.images.set(3, open('./downloads/artwork.jpg', 'rb').read(), 'image/jpeg', 'AlbumArt')
+            song_file.tag.images.set(3, resource_stream(__name__, 'resources/artwork.jpg').read(), 'image/jpeg',
+                                     'AlbumArt')
 
             song_file.tag.save()

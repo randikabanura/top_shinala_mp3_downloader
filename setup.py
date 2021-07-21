@@ -36,6 +36,8 @@ setup(
     url='https://github.com/randikabanura/top_sinhala_mp3_downloader',
     download_url='https://github.com/randikabanura/top_sinhala_mp3_downloader/archive/0.5.0.tar.gz',
     dependency_links=dependency_links,
+    include_package_data=True,
+    package_data={'': ['resources/*.jpg']},
     author_email='randika.banura@gmail.com',
     classifiers=[
         "License :: OSI Approved :: MIT License",
