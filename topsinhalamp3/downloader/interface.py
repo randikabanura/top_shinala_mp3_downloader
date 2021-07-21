@@ -263,5 +263,5 @@ class Interface(object):
         cmd = 'initial'
         while cmd not in ['exit', 'quit', 'close']:
             self.__redirect_to_function(cmd)
-            cmd = input('> ').lower()
+            cmd = input('>>> ').lower()
             self.__cmds.append(cmd)
