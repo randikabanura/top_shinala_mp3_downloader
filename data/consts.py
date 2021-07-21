@@ -8,3 +8,4 @@ artist_letter_based_regex = r"^[a-zA-Z]{1}$"
 artists_per_page = 25
 songs_per_page = 50
 file_download_path = './downloads'
+update_mp3_tag = True

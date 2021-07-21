@@ -5,6 +5,7 @@ from .consts import *
 import shutil
 from urllib.error import URLError
 import os
+import eyed3
 
 
 class DataLoader(object):
@@ -47,6 +48,10 @@ class DataLoader(object):
                 shutil.copyfileobj(response, out_file)
 
             print("Successfully download Song: ", name)
+
+            if update_mp3_tag:
+                self.mp3_tag_update(name, values)
+                print("Successfully MP3 tags updated")
         except URLError as e:
             if hasattr(e, 'reason'):
                 print('We failed to reach a server.')
@@ -175,3 +180,18 @@ class DataLoader(object):
                     songs_list.append(next_page_name)
 
         return songs_list
+
+    def mp3_tag_update(self, path: str, song_values: dict):
+        song_file = eyed3.load(path)
+
+        if song_file is not None:
+            if song_file.tag is None:
+                song_file.initTag()
+
+            song_file.tag.title = song_values['song_name']
+            song_file.tag.album = song_values['artist_description']
+            song_file.tag.comments.set(song_values['artist_description'])
+            song_file.tag.images.remove('AlbumArt')
+            song_file.tag.images.set(3, open('./downloads/artwork.jpg', 'rb').read(), 'image/jpeg', 'AlbumArt')
+
+            song_file.tag.save()
