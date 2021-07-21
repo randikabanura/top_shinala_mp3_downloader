@@ -52,9 +52,9 @@ class SongREG:
                     c.execute(f'INSERT INTO artist_name(name, artist_idartist) VALUES("{arr["artist_name"]}", {artist_id})')
                     self.conn.commit()
                 else:
-                    print('error 01')
+                    print('issue: multiple artist 01')
             else:
-                print('error 02')
+                print('issue: multiple artist 02')
                 # for row in rst:
                 #     artist_id = row.artist_idartist
                 #     c.execute(f'SELECT * FROM artist_name WHERE artist_idartist = {artist_id} AND name = "{arr["artist_name"]}"')
