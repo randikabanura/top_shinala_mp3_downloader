@@ -57,7 +57,7 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def download_file_from_url(self, url: str, name: str, artist: str):
+    def download_file_from_url(self, url: str, name: str, artist: str, artist_url: str):
         self.set_soup(url)
         source = self.__soup.find('div', id='tsmp3-player').find(class_='player-source')
 
@@ -81,8 +81,10 @@ class DataLoader(object):
             'source_id': source_id,
             'artist_description': song_artist_details,
             'artist_name': artist,
+            'artist_url': artist_url,
             'song_name': name,
-            'path': source_link
+            'song_url': source_link,
+            'path': file_name
         }
 
         self.__download_file(source_link, directory, file_name, song_values)
@@ -151,6 +153,7 @@ class DataLoader(object):
                 'page': int(page),
                 'index': (songs_per_page * int(page - 1)) + int(i + 1),
                 'artist': artist,
+                'artist_url': url,
                 'song': song.text,
                 'url': base_url + song.get('href').split('/', 1)[-1]
             }

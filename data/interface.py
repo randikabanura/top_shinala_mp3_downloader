@@ -49,23 +49,6 @@ class Interface(object):
         else:
             self.__handle_back(cmd, self.__print_initial_msg)
 
-    def __show_results_name(self, cmd):
-        item_list = self.__data_loader.get_name_list_from(cmd, self.__page_id)
-        if item_list is None:
-            if self.__page_id == 1:
-                print("There is no song starts with the given character %s", cmd)
-                self.__handle_back('99', self.__search, True)
-                return
-            print('The given id is not valid. Starting from the beginning')
-            self.__page_id = 1
-            name_list, page_info = self.__data_loader.get_name_list_from(cmd, self.__page_id)
-        name_list, page_info = item_list
-        print(
-            '\n'.join(['%d) %s [downloads: %d]' % (item['index'], item['name'], item['count']) for item in name_list]))
-        print(page_info)
-        print('\nEnter nn to goto next page. pp to previous page. id<num> to goto page given by <num>.')
-        print('To select a song type sel<num> to download the song given by <num> in the list')
-
     def __custom_search(self, cmd: str):
         if cmd is not None and cmd != '':
             self.__state = ARTIST_LETTER
@@ -251,10 +234,11 @@ class Interface(object):
             song_artist = song['artist']
             song_url = song['url']
             song_name = song['song']
+            song_artist_url = song['artist_url']
 
             print("Song download: Artist:", song_artist, "Song:", song_name)
             if song_url is not None:
-                self.__data_loader.download_file_from_url(song_url, song_name, song_artist)
+                self.__data_loader.download_file_from_url(song_url, song_name, song_artist, song_artist_url)
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()
