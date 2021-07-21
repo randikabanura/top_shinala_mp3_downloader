@@ -1,4 +1,5 @@
 import urllib.request as urllib2
+import urllib.parse as urlparse
 from bs4 import BeautifulSoup
 from .consts import *
 import shutil
@@ -31,7 +32,7 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def __download_file(self, url: str, directory: str, name: str):
+    def __download_file(self, url: str, directory: str, name: str, values: dict):
         if os.path.isfile(name):
             print("File already there.. Going to next :)")
             return
@@ -67,9 +68,26 @@ class DataLoader(object):
         source_link = source.get('data-src')
         directory = "{}/{}".format(self.__download_dir, artist)
         file_name = "{}/{}{}".format(directory, name, '.mp3')
-        self.__download_file(source_link, directory, file_name)
 
-    def get_artist_letters_from_url(self, url: str, letter: str = None, any: bool = True):
+        try:
+            source_id = urlparse.parse_qs(urlparse.urlparse(source_link).query)['id'][0]
+            song_artist_details = self.__soup.find('ul', class_='song_details').select('li')[1].find(text=True,
+                                                                                                     recursive=False).strip()
+        except:
+            print("Error occurred when downloading Song:", name)
+            return
+
+        song_values = {
+            'source_id': source_id,
+            'artist_description': song_artist_details,
+            'artist_name': artist,
+            'song_name': name,
+            'path': source_link
+        }
+
+        self.__download_file(source_link, directory, file_name, song_values)
+
+    def get_artist_letters_from_url(self, url: str, letter: str = None):
         self.set_soup(url)
         artist_letter_list = self.__soup.find_all('a', class_='artist_letter')
         letter_list = []
