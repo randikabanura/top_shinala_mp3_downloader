@@ -19,7 +19,7 @@ For one time use:
 ```bash
   $ git clone https://github.com/randikabanura/top_sinhala_mp3_downloader
   $ cd top_sinhala_mp3_downloader
-  $ python top_sinhala_mp3/main.py
+  $ python topsinhalamp3/main.py
 ```
 
 ## Usage
