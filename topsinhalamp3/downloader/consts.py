@@ -10,12 +10,12 @@ artists_per_page = 25
 songs_per_page = 50
 
 # Download configs
-file_download_path = '../downloads'
+file_download_path = './downloads'
 update_mp3_tag = True
 
 # Database configs
 database_enabled = True
 database_host = 'localhost'
 database_username = 'root'
-database_password = ''
+database_password = 'rootroot'
 database_name = 'mp3_scraping'

@@ -37,23 +37,26 @@ class DataLoader(object):
             print("Error Occurred. Reason:\n", e)
 
     def __download_file(self, url: str, directory: str, name: str, values: dict):
-        if database_enabled:
-            print("Database is enabled")
-            song_database = SongREG(database_host, database_username, database_password, database_name)
-            downloadable = song_database.store(values)
-            print("Song downloadable:", downloadable)
-        else:
-            print("Database is not enabled")
-            downloadable = True
-
-        if not downloadable or os.path.isfile(name):
-            print("File already there.. Going to next :)")
-            return
-        else:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-
         try:
+            if database_enabled:
+                print("Database is enabled")
+                song_database = SongREG(database_host, database_username, database_password, database_name)
+                downloadable = song_database.store(values)
+
+                if downloadable is None:
+                    downloadable = False
+                print("Song downloadable:", downloadable)
+            else:
+                print("Database is not enabled")
+                downloadable = True
+
+            if not downloadable or os.path.isfile(name):
+                print("File already there.. Going to next :)")
+                return
+            else:
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+
             print("Request URL: ", url)
             response = urllib2.urlopen(url)
             with open(name, 'wb') as out_file:
