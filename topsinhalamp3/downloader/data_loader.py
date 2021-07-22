@@ -8,6 +8,8 @@ import os
 import eyed3
 from pkg_resources import resource_stream
 
+from topsinhalamp3.database import SongREG
+
 
 class DataLoader(object):
 
@@ -35,7 +37,16 @@ class DataLoader(object):
             print("Error Occurred. Reason:\n", e)
 
     def __download_file(self, url: str, directory: str, name: str, values: dict):
-        if os.path.isfile(name):
+        if database_enabled:
+            print("Database is enabled")
+            song_database = SongREG(database_host, database_username, database_password, database_name)
+            downloadable = song_database.store(values)
+            print("Song downloadable:", downloadable)
+        else:
+            print("Database is not enabled")
+            downloadable = True
+
+        if not downloadable or os.path.isfile(name):
             print("File already there.. Going to next :)")
             return
         else:
@@ -90,6 +101,7 @@ class DataLoader(object):
             'artist_url': artist_url,
             'song_name': name,
             'song_url': source_link,
+            'song_description': '',
             'path': file_name
         }
 

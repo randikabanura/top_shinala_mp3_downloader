@@ -14,7 +14,7 @@ class SongREG:
 
         if row_count == 0:
             c.execute(
-                f'INSERT INTO song(source_id, name, path, song_desc, status, genre_idgenre) VALUES({arr["source_id"]}, "{arr["song_name"]}", "{arr["path"]}", "{arr["song_desc"]}", 0, 1)')
+                f'INSERT INTO song(source_id, name, path, song_desc, status, genre_idgenre) VALUES({arr["source_id"]}, "{arr["song_name"]}", "{arr["path"]}", "{arr["song_description"]}", 0, 1)')
             self.conn.commit()
             c.execute('SELECT idsong FROM song ORDER BY idsong DESC LIMIT 1')
             rst = c.fetchone()
@@ -171,26 +171,26 @@ class SongREG:
                                 return False
 
 
-instance = SongREG("localhost", "root", "", "mp3_scraping")
+#instance = SongREG("localhost", "root", "rootroot", "mp3_scraping")
 
-# instance.store({"source_id":1, "song_name":"song1", "artist_name":"artist1", "path":"path1", "artist_url":"https://site.com/artists/artist1-song-mp3", "song_desc":"song1_desc"})
+#print(instance.store({"source_id":2, "song_name":"song1", "artist_name":"artist1", "path":"path1", "artist_url":"https://site.com/artists/artist1-song-mp3", "song_description":"song1_desc"}))
 
-# instance.store({"source_id":2, "song_name":"song2", "artist_name":"artist2", "path":"path2", "artist_url":"https://site.com/artists/artist2-song-mp3", "song_desc":"song2_desc"})
-
-# instance.store({"source_id":3, "song_name":"song3", "artist_name":"artist2", "path":"path3", "artist_url":"https://site.com/artists/artist2-song-mp3", "song_desc":"song3_desc"})
-
-# instance.store({"source_id":4, "song_name":"song4", "artist_name":"artist2 v2", "path":"path4", "artist_url":"https://site.com/artists/artist2-song-mp3", "song_desc":"song4_desc"})
-
-# instance.store({"source_id":5, "song_name":"song5", "artist_name":"artist3", "path":"path5", "artist_url":"https://site.com/artists/artist3-song-mp3", "song_desc":"song5_desc"})
-
-# instance.store({"source_id":5, "song_name":"song5", "artist_name":"artist4", "path":"path5", "artist_url":"https://site.com/artists/artist4-song-mp3", "song_desc":"song5_desc"})
-
-# instance.store({"source_id":6, "song_name":"song6", "artist_name":"artist5", "path":"path6", "artist_url":"https://site.com/artists/artist5-song-mp3", "song_desc":"song6_desc"})
-
-# instance.store({"source_id":6, "song_name":"song6", "artist_name":"artist1", "path":"path6", "artist_url":"https://site.com/artists/artist1-song-mp3", "song_desc":"song6_desc"})
-
-# instance.store({"source_id":6, "song_name":"song6", "artist_name":"artist3 v2", "path":"path6", "artist_url":"https://site.com/artists/artist3-song-mp3", "song_desc":"song6_desc"})
-
-# instance.store({"source_id":7, "song_name":"song7", "artist_name":"artist6", "path":"path7", "artist_url":"https://site.com/artists/artist6-song-mp3", "song_desc":"song7_desc"})
-
-# instance.store({"source_id":7, "song_name":"song7", "artist_name":"artist7", "path":"path7", "artist_url":"https://site.com/artists/artist7-song-mp3", "song_desc":"song7_desc"})
+# instance.store({"source_id":2, "song_name":"song2", "artist_name":"artist2", "path":"path2", "artist_url":"https://site.com/artists/artist2-song-mp3", "song_description":"song2_desc"})
+#
+# instance.store({"source_id":3, "song_name":"song3", "artist_name":"artist2", "path":"path3", "artist_url":"https://site.com/artists/artist2-song-mp3", "song_description":"song3_desc"})
+#
+# instance.store({"source_id":4, "song_name":"song4", "artist_name":"artist2 v2", "path":"path4", "artist_url":"https://site.com/artists/artist2-song-mp3", "song_description":"song4_desc"})
+#
+# instance.store({"source_id":5, "song_name":"song5", "artist_name":"artist3", "path":"path5", "artist_url":"https://site.com/artists/artist3-song-mp3", "song_description":"song5_desc"})
+#
+# instance.store({"source_id":5, "song_name":"song5", "artist_name":"artist4", "path":"path5", "artist_url":"https://site.com/artists/artist4-song-mp3", "song_description":"song5_desc"})
+#
+# instance.store({"source_id":6, "song_name":"song6", "artist_name":"artist5", "path":"path6", "artist_url":"https://site.com/artists/artist5-song-mp3", "song_description":"song6_desc"})
+#
+# instance.store({"source_id":6, "song_name":"song6", "artist_name":"artist1", "path":"path6", "artist_url":"https://site.com/artists/artist1-song-mp3", "song_description":"song6_desc"})
+#
+# instance.store({"source_id":6, "song_name":"song6", "artist_name":"artist3 v2", "path":"path6", "artist_url":"https://site.com/artists/artist3-song-mp3", "song_description":"song6_desc"})
+#
+# instance.store({"source_id":7, "song_name":"song7", "artist_name":"artist6", "path":"path7", "artist_url":"https://site.com/artists/artist6-song-mp3", "song_description":"song7_desc"})
+#
+# instance.store({"source_id":7, "song_name":"song7", "artist_name":"artist7", "path":"path7", "artist_url":"https://site.com/artists/artist7-song-mp3", "song_description":"song7_desc"})

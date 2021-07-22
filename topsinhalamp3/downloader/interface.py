@@ -261,7 +261,7 @@ class Interface(object):
 
     def begin(self):
         cmd = 'initial'
-        while cmd not in ['exit', 'quit', 'close']:
+        while cmd not in ['exit', 'quit', 'close', 'exit()', 'quit()', 'close()']:
             self.__redirect_to_function(cmd)
             cmd = input('>>> ').lower()
             self.__cmds.append(cmd)

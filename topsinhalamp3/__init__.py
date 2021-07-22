@@ -1,1 +1,1 @@
-from topsinhalamp3.main import *
+from .main import *
