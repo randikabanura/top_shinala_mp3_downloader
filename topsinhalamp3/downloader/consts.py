@@ -17,5 +17,5 @@ update_mp3_tag = True
 database_enabled = True
 database_host = 'localhost'
 database_username = 'root'
-database_password = ''
+database_password = 'rootroot'
 database_name = 'mp3_scraping'

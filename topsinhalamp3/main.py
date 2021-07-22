@@ -1,5 +1,4 @@
-from topsinhalamp3.downloader import Interface
-
+from downloader import Interface
 
 def main():
     Interface().begin()

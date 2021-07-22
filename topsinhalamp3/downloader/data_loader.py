@@ -8,7 +8,7 @@ import os
 import eyed3
 from pkg_resources import resource_stream
 
-from topsinhalamp3.database import SongREG
+from .database.song_reg import SongREG
 
 
 class DataLoader(object):
