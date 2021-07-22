@@ -97,6 +97,8 @@ class DataLoader(object):
             source_id = urlparse.parse_qs(urlparse.urlparse(source_link).query)['id'][0]
             song_artist_details = self.__soup.find('ul', class_='song_details').select('li')[1].find(text=True,
                                                                                                      recursive=False).strip()
+            song_description = self.__soup.find('ul', class_='song_raw_data').select('li')[2].find(text=True,
+                                                                                                   recursive=False).strip()
         except:
             print("Error occurred when downloading Song:", name)
             return
@@ -108,7 +110,7 @@ class DataLoader(object):
             'artist_url': artist_url,
             'song_name': name,
             'song_url': source_link,
-            'song_description': '',
+            'song_description': song_description,
             'path': file_name
         }
 
