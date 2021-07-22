@@ -45,6 +45,10 @@ class DataLoader(object):
 
                 if downloadable is None:
                     downloadable = False
+
+                if downloadable is False and (not os.path.isfile(name)):
+                    downloadable = True
+
                 print("Song downloadable:", downloadable)
             else:
                 print("Database is not enabled")
