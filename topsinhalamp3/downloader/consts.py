@@ -14,8 +14,8 @@ file_download_path = './downloads'
 update_mp3_tag = True
 
 # Database configs
-database_enabled = True
+database_enabled = False
 database_host = 'localhost'
 database_username = 'root'
-database_password = 'rootroot'
+database_password = ''
 database_name = 'mp3_scraping'
