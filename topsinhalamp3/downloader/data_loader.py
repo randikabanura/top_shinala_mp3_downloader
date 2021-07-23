@@ -217,7 +217,8 @@ class DataLoader(object):
                 song_file.initTag()
 
             song_file.tag.title = song_values['song_name']
-            song_file.tag.album = song_values['artist_description']
+            song_file.tag.album = song_values['artist_name']
+            song_file.tag.album_artist = song_values['artist_name']
             song_file.tag.comments.set(song_values['artist_description'])
 
             song_file.tag.images.remove('AlbumArt')
