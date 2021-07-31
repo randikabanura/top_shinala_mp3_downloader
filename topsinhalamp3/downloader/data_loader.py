@@ -146,7 +146,7 @@ class DataLoader(object):
                 values = {
                     'index': count,
                     'name': year_month.text,
-                    'url': top_25_categories_url + year_month.get('href')
+                    'url': new_sinhala_categories_url + year_month.get('href')
                 }
 
                 months_list.append(values)
@@ -225,7 +225,7 @@ class DataLoader(object):
             }
 
             if song_type.lower() == 'month':
-                values['url'] = top_25_base_url + song.get('href').split('/', 1)[-1]
+                values['url'] = new_sinhala_base_url + song.get('href').split('/', 1)[-1]
 
             songs_list.append(values)
 
@@ -237,7 +237,10 @@ class DataLoader(object):
             next_pages = navigation_bar.find_all(class_='bnav_button')
 
             for next_page in next_pages:
-                next_page_url = base_artist_url + next_page.get('href')
+                if song_type.lower() == 'month':
+                    next_page_url = new_sinhala_categories_url + next_page.get('href')
+                else:
+                    next_page_url = base_artist_url + next_page.get('href')
 
                 if next_page.text.lower() == 'previous' or next_page.text.lower() == 'next':
                     continue

@@ -1,6 +1,7 @@
 from .states import *
 from .consts import *
 from .data_loader import DataLoader
+from tqdm import tqdm
 
 import re
 
@@ -21,7 +22,8 @@ class Interface(object):
         print("Anytime, if you want to go back enter 99 and if you want to start from the beginning enter 999..")
         print("Also you can exit the software by typing quit...")
         print(
-            "Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) All Artists \n\t4) Top 25 by Month \n\t5) All Top 25 by Month")
+            "Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) All Artists \n\t4) Top 25 by "
+            "Month \n\t5) All Top 25 by Month \n\t6) New by Month \n\t7) All New by Month")
         print("Please enter a number below")
         self.__state = INITIAL_STATE
 
@@ -54,6 +56,13 @@ class Interface(object):
         elif cmd in '5)':
             self.__state = ALL_TOP_25_BY_MONTH
             self.__top_25_all_download('')
+        elif cmd in '6)':
+            print("Enter the first letter of the Month")
+            self.__state = NEW_BY_MONTH_ENTERED
+            self.__new_month_results('')
+        elif cmd in '7)':
+            self.__state = ALL_NEW_BY_MONTH
+            self.__new_all_download('')
         else:
             self.__handle_back(cmd, self.__print_initial_msg)
 
@@ -248,6 +257,58 @@ class Interface(object):
 
         self.__handle_back('999', self.__print_initial_msg)
 
+    def __new_month_results(self, cmd):
+        print("Month based show results")
+        url = new_sinhala_month_url
+
+        months_list = self.__get_months(url)
+        if months_list is None:
+            return
+
+        print("Select a number for the Month")
+        for month in months_list:
+            print("{}) {}".format(month['index'], month['name']))
+
+        self.__state = NEW_BY_MONTH
+
+    def __new_month_based(self, cmd):
+        print("Month based download")
+
+        args = cmd.split()
+        url = new_sinhala_month_url
+        args = args[0:]
+        month_index = args[0]
+
+        if month_index is None:
+            print("Input is not correct. Number:", month_index)
+            return
+        else:
+            month_index = int(month_index)
+
+        months_list = self.__get_months(url)
+
+        if months_list is None:
+            return
+
+        songs_list = self.__get_songs(months_list, True, month_index, song_type='Month')
+        self.__download_songs(songs_list, song_type='Month', folder_prefix='New Sinhala')
+
+        self.__handle_back('999', self.__print_initial_msg)
+
+    def __new_all_download(self, cmd):
+        print("All Months download")
+
+        url = new_sinhala_month_url
+        months_list = self.__get_months(url)
+
+        if months_list is None:
+            return
+
+        songs_list = self.__get_songs(months_list, song_type='Month')
+        self.__download_songs(songs_list, song_type='Month', folder_prefix='New Sinhala')
+
+        self.__handle_back('999', self.__print_initial_msg)
+
     def __get_months(self, url: str):
         months_list = self.__data_loader.get_months_list_from_url(url)
 
@@ -291,7 +352,7 @@ class Interface(object):
         return songs_list
 
     def __download_songs(self, song_list: list = [], song_type: str = 'Artist', folder_prefix: str = ''):
-        for song in song_list:
+        for song in tqdm(song_list):
             song_item = "{} {}".format(folder_prefix, song['item']).strip()
             song_url = song['url']
             song_name = song['song']
@@ -325,6 +386,12 @@ class Interface(object):
             self.__top_25_month_based(cmd)
         elif self.__state == ALL_TOP_25_BY_MONTH:
             self.__top_25_all_download(cmd)
+        elif self.__state == NEW_BY_MONTH_ENTERED:
+            self.__new_month_results(cmd)
+        elif self.__state == NEW_BY_MONTH:
+            self.__new_month_based(cmd)
+        elif self.__state == ALL_NEW_BY_MONTH:
+            self.__new_all_download(cmd)
 
     def begin(self):
         cmd = 'initial'
