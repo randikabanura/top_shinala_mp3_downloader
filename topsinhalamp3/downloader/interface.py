@@ -20,7 +20,8 @@ class Interface(object):
         print("Welcome to Top Sinhala MP3 Downloader..\nEnter your commands below...\n")
         print("Anytime, if you want to go back enter 99 and if you want to start from the beginning enter 999..")
         print("Also you can exit the software by typing quit...")
-        print("Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) All Artists")
+        print(
+            "Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) All Artists \n\t4) Top 25 by Month \n\t5) All Top 25 by Month")
         print("Please enter a number below")
         self.__state = INITIAL_STATE
 
@@ -44,8 +45,15 @@ class Interface(object):
             print("Enter the first letter of the Artists")
             self.__state = ARTIST_NAME_ENTERED
         elif cmd in '3)':
-            print("Enter the first letter of the name of the artist")
             self.__state = ALL_DOWNLOAD
+            self.__artist_all_download('')
+        elif cmd in '4)':
+            print("Enter the first letter of the Month")
+            self.__state = TOP_25_BY_MONTH_ENTERED
+            self.__top_25_month_results('')
+        elif cmd in '5)':
+            self.__state = ALL_TOP_25_BY_MONTH
+            self.__top_25_all_download('')
         else:
             self.__handle_back(cmd, self.__print_initial_msg)
 
@@ -125,19 +133,8 @@ class Interface(object):
     def __artist_all_download(self, cmd: str):
         print("All Artist download")
 
-        args = cmd.split()
         url = full_letter_url
-        args = args[1:]
-        count_lim = 0
-        for arg in args:
-            if arg.startswith('d'):
-                try:
-                    count_lim = int(arg[1:])
-                except:
-                    print('error number format. Try again as d<num>')
-                    return
-        if count_lim == 0:
-            print("Downloading all songs..")
+        print("Downloading all songs..")
 
         artist_list = self.__get_artists(url)
         if artist_list is None:
@@ -199,6 +196,63 @@ class Interface(object):
         self.__artist_name_letter = None
         self.__handle_back('999', self.__print_initial_msg)
 
+    def __top_25_month_results(self, cmd):
+        print("Month based show results")
+        url = top_25_month_url
+
+        months_list = self.__get_months(url)
+        if months_list is None:
+            return
+
+        print("Select a number for the Month")
+        for month in months_list:
+            print("{}) {}".format(month['index'], month['name']))
+
+        self.__state = TOP_25_BY_MONTH
+
+    def __top_25_month_based(self, cmd):
+        print("Month based download")
+
+        args = cmd.split()
+        url = top_25_month_url
+        args = args[0:]
+        month_index = args[0]
+
+        if month_index is None:
+            print("Input is not correct. Number:", month_index)
+            return
+        else:
+            month_index = int(month_index)
+
+        months_list = self.__get_months(url)
+
+        if months_list is None:
+            return
+
+        songs_list = self.__get_songs(months_list, True, month_index, song_type='Month')
+        self.__download_songs(songs_list, song_type='Month', folder_prefix='Top 25 Sinhala')
+
+        self.__handle_back('999', self.__print_initial_msg)
+
+    def __top_25_all_download(self, cmd):
+        print("All Months download")
+
+        url = top_25_month_url
+        months_list = self.__get_months(url)
+
+        if months_list is None:
+            return
+
+        songs_list = self.__get_songs(months_list, song_type='Month')
+        self.__download_songs(songs_list, song_type='Month', folder_prefix='Top 25 Sinhala')
+
+        self.__handle_back('999', self.__print_initial_msg)
+
+    def __get_months(self, url: str):
+        months_list = self.__data_loader.get_months_list_from_url(url)
+
+        return months_list
+
     def __get_artists(self, url: str, letter: str = None):
         letter_list = self.__data_loader.get_artist_letters_from_url(url, letter)
 
@@ -217,28 +271,35 @@ class Interface(object):
 
         return artist_list
 
-    def __get_songs(self, artist_list: list = [], one_artist: bool = False, artist_index: int = None):
+    def __get_songs(self, url_list: list = [], one_url: bool = False, index_number: int = None,
+                    song_type: str = 'Artist'):
         songs_list = []
-        for artist in artist_list:
-            if artist['url'] is not None and artist['name'] is not None and (not one_artist or artist['index'] == artist_index):
-                print('Getting Songs from Artist: ', artist['name'], 'URL: ', artist['url'])
-                songs_name_list = self.__data_loader.get_songs_list_from_url(artist['url'], artist['name'])
+        for item in url_list:
+
+            if item['url'] is not None and item['name'] is not None and (
+                    not one_url or item['index'] == index_number):
+                print('Getting Songs from Item: ', item['name'], 'URL: ', item['url'])
+                songs_name_list = self.__data_loader.get_songs_list_from_url(item['url'], item['name'],
+                                                                             song_type=song_type)
+
+                if songs_name_list is None:
+                    return songs_list
 
                 for song_name in songs_name_list:
                     songs_list.append(song_name)
 
         return songs_list
 
-    def __download_songs(self, song_list: list = []):
+    def __download_songs(self, song_list: list = [], song_type: str = 'Artist', folder_prefix: str = ''):
         for song in song_list:
-            song_artist = song['artist']
+            song_item = "{} {}".format(folder_prefix, song['item']).strip()
             song_url = song['url']
             song_name = song['song']
-            song_artist_url = song['artist_url']
+            song_item_url = song['item_url']
 
-            print("Song download: Artist:", song_artist, "Song:", song_name)
+            print("Song download: Item:", song_item, "Song:", song_name)
             if song_url is not None:
-                self.__data_loader.download_file_from_url(song_url, song_name, song_artist, song_artist_url)
+                self.__data_loader.download_file_from_url(song_url, song_name, song_item, song_item_url, song_type)
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()
@@ -258,6 +319,12 @@ class Interface(object):
             self.__artist_name_based(cmd)
         elif self.__state == ALL_DOWNLOAD:
             self.__artist_all_download(cmd)
+        elif self.__state == TOP_25_BY_MONTH_ENTERED:
+            self.__top_25_month_results(cmd)
+        elif self.__state == TOP_25_BY_MONTH:
+            self.__top_25_month_based(cmd)
+        elif self.__state == ALL_TOP_25_BY_MONTH:
+            self.__top_25_all_download(cmd)
 
     def begin(self):
         cmd = 'initial'

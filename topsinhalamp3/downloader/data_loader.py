@@ -81,9 +81,13 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def download_file_from_url(self, url: str, name: str, artist: str, artist_url: str):
+    def download_file_from_url(self, url: str, name: str, artist: str, item_url: str, song_type: str = 'Artist'):
         self.set_soup(url)
-        source = self.__soup.find('div', id='tsmp3-player').find(class_='player-source')
+
+        if song_type.lower() == 'month':
+            source = self.__soup.find('div', id='nsmp3-player').find(class_='player-source')
+        else:
+            source = self.__soup.find('div', id='tsmp3-player').find(class_='player-source')
 
         if source is None or source.get('data-src') is None or source.get('data-src') == '#':
             print('Source URL: ', source, 'does not have a valid  url')
@@ -113,7 +117,7 @@ class DataLoader(object):
             'source_id': source_id,
             'artist_description': song_artist_details,
             'artist_name': artist,
-            'artist_url': artist_url,
+            'item_url': item_url,
             'song_name': name,
             'song_url': source_link,
             'song_description': song_description,
@@ -121,6 +125,33 @@ class DataLoader(object):
         }
 
         self.__download_file(source_link, directory, file_name, song_values)
+
+    def get_months_list_from_url(self, url):
+        self.set_soup(url)
+        months_list = []
+        count = 0
+
+        months_container_list = self.__soup.find_all('div', class_="months_container")
+        for i, month_container in enumerate(months_container_list):
+            if month_container is None:
+                continue
+
+            year_month_list = month_container.find_all('a', attrs={'class': None})
+            for j, year_month in enumerate(year_month_list):
+                if year_month is None or year_month.get('href') == '#':
+                    continue
+
+                count += 1
+
+                values = {
+                    'index': count,
+                    'name': year_month.text,
+                    'url': top_25_categories_url + year_month.get('href')
+                }
+
+                months_list.append(values)
+
+        return months_list
 
     def get_artist_letters_from_url(self, url: str, letter: str = None):
         self.set_soup(url)
@@ -176,24 +207,34 @@ class DataLoader(object):
 
         return artist_list
 
-    def get_songs_list_from_url(self, url: str, artist: str, get_next_page: bool = True, page: int = 1):
+    def get_songs_list_from_url(self, url: str, artist: str, get_next_page: bool = True, page: int = 1,
+                                song_type: str = 'Artist'):
         self.set_soup(url)
         songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         songs_list = []
         for i, song in enumerate(songs_name_list):
             print('Song Name: ', song.text)
+
             values = {
                 'page': int(page),
                 'index': (songs_per_page * int(page - 1)) + int(i + 1),
-                'artist': artist,
-                'artist_url': url,
+                'item': artist,
+                'item_url': url,
                 'song': song.text,
                 'url': base_url + song.get('href').split('/', 1)[-1]
             }
+
+            if song_type.lower() == 'month':
+                values['url'] = top_25_base_url + song.get('href').split('/', 1)[-1]
+
             songs_list.append(values)
 
         if get_next_page:
-            next_pages = self.__soup.find(class_='bottom_navigation_bar').find_all(class_='bnav_button')
+            navigation_bar = self.__soup.find(class_='bottom_navigation_bar')
+            if navigation_bar is None:
+                return songs_list
+
+            next_pages = navigation_bar.find_all(class_='bnav_button')
 
             for next_page in next_pages:
                 next_page_url = base_artist_url + next_page.get('href')
@@ -202,7 +243,7 @@ class DataLoader(object):
                     continue
 
                 next_page_no = int(next_page.text)
-                next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, False, next_page_no)
+                next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, False, next_page_no, song_type)
 
                 for next_page_name in next_page_songs_list:
                     songs_list.append(next_page_name)

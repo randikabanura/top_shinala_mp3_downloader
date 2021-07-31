@@ -5,12 +5,15 @@ base_letter_url = 'https://www.topsinhalamp3.com/music/'
 full_letter_url = 'https://www.topsinhalamp3.com/music/artists-a-to-z.php'
 base_artist_url = 'https://www.topsinhalamp3.com/artists/'
 base_song_url = 'https://www.topsinhalamp3.com/songs/'
+top_25_base_url = 'https://www.newsinhalamp3.com/'
+top_25_categories_url = 'https://www.newsinhalamp3.com/categories/'
+top_25_month_url = 'https://www.newsinhalamp3.com/categories/top-25-new-sinhala-mp3-songs.php'
 artist_letter_based_regex = r"^[a-zA-Z]{1}$"
 artists_per_page = 25
 songs_per_page = 50
 
 # Download configs
-file_download_path = './downloads'
+file_download_path = '$HOME/Desktop/test/music'
 update_mp3_tag = True
 
 # Database configs
