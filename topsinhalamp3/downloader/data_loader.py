@@ -104,7 +104,11 @@ class DataLoader(object):
             song_genre = self.__soup.find('ul', class_='song_raw_data').select('li')[5].find(text=True,
                                                                                              recursive=False).strip()
 
-            directory = "{}/{}/{}".format(self.__download_dir, artist, artist)
+            if song_type.lower() == 'month':
+                directory = "{}/{}/{}".format(self.__download_dir, 'NewSinhalaMP3', artist)
+            else:
+                directory = "{}/{}/{}".format(self.__download_dir, 'TopSinhalaMP3', artist)
+
             file_name = "{}/{}{}".format(directory, name, '.mp3')
 
             directory = os.path.expandvars(directory)
