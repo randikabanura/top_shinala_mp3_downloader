@@ -14,7 +14,7 @@ artists_per_page = 25
 songs_per_page = 50
 
 # Download configs
-file_download_path = '$HOME/Desktop/test/music'
+file_download_path = './downloads'
 update_mp3_tag = True
 
 # Database configs
