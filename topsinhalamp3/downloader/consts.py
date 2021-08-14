@@ -25,9 +25,9 @@ database_password = ''
 database_name = 'mp3_scraping'
 
 # s3 upload
-enabled_s3_upload = True
+enabled_s3_upload = False
 keep_local_file_after_download = False
-bucket_name = 'media'  # bucket must be available
-bucket_endpoint = ''
+bucket_name = 'media'  # Bucket must be available
+bucket_endpoint = ''  # Can use AWS S3, DigitalOcean spaces, Wasabi S3 and other S3 compatible services
 access_key = ''  # Need to have write access
 secret_access_key = ''  # Need to have write access

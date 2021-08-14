@@ -36,11 +36,20 @@ Do you need to search by:
 
 After selecting the desired option please follow the on screen details to download songs.
 Also, you can change the configurations in the `topsinhalamp3/downloader/consts.py` file to customize the downloading process.
-Please DO NOT change anything except of the following two options.
+Please DO NOT change anything except of the following options.
 
 ```bash
 file_download_path = './downloads' # Can change download location for the files
 update_mp3_tag = True # If you make this false mp3 tags will not be updated.
+database_enabled = False # This need to have the mysql database with same schema provided in ./db folder
+
+# If you want to upload songs to s3 bucket please configure following options
+enabled_s3_upload = True
+keep_local_file_after_download = False
+bucket_name = 'media'  # Bucket must be available
+bucket_endpoint = '' # Can use AWS S3, DigitalOcean spaces, Wasabi S3 and other S3 compatible services
+access_key = ''  # Need to have write access
+secret_access_key = '' # Need to have write access
 ```
 
 ## Developer
