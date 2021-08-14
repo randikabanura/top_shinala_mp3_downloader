@@ -1,5 +1,6 @@
 import urllib.request as urllib2
 import urllib.parse as urlparse
+import boto3
 from bs4 import BeautifulSoup
 from .consts import *
 import shutil
@@ -71,6 +72,10 @@ class DataLoader(object):
             if update_mp3_tag:
                 self.mp3_tag_update(name, values)
                 print("Successfully MP3 tags updated")
+
+            if enabled_s3_upload:
+                self.upload_to_s3_bucket(name, values['s3_directory'])
+
         except URLError as e:
             if hasattr(e, 'reason'):
                 print('We failed to reach a server.')
@@ -80,6 +85,24 @@ class DataLoader(object):
                 print('Error code: ', e.code)
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
+
+    def upload_to_s3_bucket(self, path: str, s3_directory: str):
+        print('Upload to S3 bucket initiated')
+
+        try:
+            session = boto3.session.Session()
+            client = session.client('s3',
+                                    endpoint_url=bucket_endpoint,
+                                    aws_access_key_id=access_key,
+                                    aws_secret_access_key=secret_access_key)
+
+            client.upload_file(path, bucket_name, s3_directory)
+            print('Upload to S3 successful')
+        except Exception as e:
+            print("Upload unsuccessful. Error Occurred. Reason:\n", e)
+
+        if not keep_local_file_after_download:
+            os.remove(path)
 
     def download_file_from_url(self, url: str, name: str, artist: str, item_url: str, song_type: str = 'Artist'):
         self.set_soup(url)
@@ -106,10 +129,13 @@ class DataLoader(object):
 
             if song_type.lower() == 'month':
                 directory = "{}/{}/{}".format(self.__download_dir, 'NewSinhalaMP3', artist)
+                s3_directory_format = "{}/{}".format('NewSinhalaMP3', artist)
             else:
                 directory = "{}/{}/{}".format(self.__download_dir, 'TopSinhalaMP3', artist)
+                s3_directory_format = "{}/{}".format('TopSinhalaMP3', artist)
 
             file_name = "{}/{}{}".format(directory, name, '.mp3')
+            s3_directory = "{}/{}{}".format(s3_directory_format, name, '.mp3')
 
             directory = os.path.expandvars(directory)
             file_name = os.path.expandvars(file_name)
@@ -125,6 +151,7 @@ class DataLoader(object):
             'song_name': name,
             'song_url': source_link,
             'song_description': song_description,
+            's3_directory': s3_directory,
             'path': file_name
         }
 
@@ -250,7 +277,8 @@ class DataLoader(object):
                     continue
 
                 next_page_no = int(next_page.text)
-                next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, False, next_page_no, song_type)
+                next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, False, next_page_no,
+                                                                    song_type)
 
                 for next_page_name in next_page_songs_list:
                     songs_list.append(next_page_name)

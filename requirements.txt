@@ -2,3 +2,4 @@ beautifulsoup4
 urllib3
 eyed3
 tqdm
+boto3
