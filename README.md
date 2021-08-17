@@ -32,6 +32,10 @@ Do you need to search by:
         1) Artist Letter 
         2) Artist Name 
         3) All Artists
+        4) Top 25 by Month 
+        5) All Top 25 by Month 
+        6) New by Month 
+        7) All New by Month
 ```
 
 After selecting the desired option please follow the on screen details to download songs.
