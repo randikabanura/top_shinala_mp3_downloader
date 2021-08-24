@@ -1,6 +1,7 @@
 import urllib.request as urllib2
 import urllib.parse as urlparse
 import boto3
+from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
 from .consts import *
 import shutil
@@ -96,8 +97,17 @@ class DataLoader(object):
                                     aws_access_key_id=access_key,
                                     aws_secret_access_key=secret_access_key)
 
-            client.upload_file(path, bucket_name, s3_directory)
-            print('Upload to S3 successful')
+            try:
+                client.head_object(Bucket=bucket_name, Key=s3_directory)
+            except ClientError as e:
+                if e.response['Error']['Code'] == "404":
+                    client.upload_file(path, bucket_name, s3_directory)
+                    print('Upload to S3 successful')
+                else:
+                    raise e
+            else:
+                print('File already exists')
+
         except Exception as e:
             print("Upload unsuccessful. Error Occurred. Reason:\n", e)
 
