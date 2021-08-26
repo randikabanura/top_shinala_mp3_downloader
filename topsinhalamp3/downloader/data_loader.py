@@ -101,7 +101,8 @@ class DataLoader(object):
                 else:
                     raise e
             else:
-                print("File already there.. Going to next :)")
+                if enabled_s3_upload:
+                    print("File already there.. Going to next :)")
 
         except URLError as e:
             if hasattr(e, 'reason'):
