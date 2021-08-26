@@ -64,13 +64,25 @@ class DataLoader(object):
                     os.makedirs(directory)
 
             try:
-                session = boto3.session.Session()
-                client = session.client('s3',
-                                        endpoint_url=bucket_endpoint,
-                                        aws_access_key_id=access_key,
-                                        aws_secret_access_key=secret_access_key)
+                if enabled_s3_upload:
+                    session = boto3.session.Session()
+                    client = session.client('s3',
+                                            endpoint_url=bucket_endpoint,
+                                            aws_access_key_id=access_key,
+                                            aws_secret_access_key=secret_access_key)
 
-                client.head_object(Bucket=bucket_name, Key=values['s3_directory'])
+                    client.head_object(Bucket=bucket_name, Key=values['s3_directory'])
+                else:
+                    print("Request URL: ", url)
+                    response = urllib2.urlopen(url)
+                    with open(name, 'wb') as out_file:
+                        shutil.copyfileobj(response, out_file)
+
+                    print("Successfully download Song: ", name)
+
+                    if update_mp3_tag:
+                        self.mp3_tag_update(name, values)
+                        print("Successfully MP3 tags updated")
             except ClientError as e:
                 if e.response['Error']['Code'] == "404":
                     print("Request URL: ", url)
