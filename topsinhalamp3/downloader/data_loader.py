@@ -63,19 +63,33 @@ class DataLoader(object):
                 if not os.path.exists(directory):
                     os.makedirs(directory)
 
-            print("Request URL: ", url)
-            response = urllib2.urlopen(url)
-            with open(name, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
+            try:
+                session = boto3.session.Session()
+                client = session.client('s3',
+                                        endpoint_url=bucket_endpoint,
+                                        aws_access_key_id=access_key,
+                                        aws_secret_access_key=secret_access_key)
 
-            print("Successfully download Song: ", name)
+                client.head_object(Bucket=bucket_name, Key=values['s3_directory'])
+            except ClientError as e:
+                if e.response['Error']['Code'] == "404":
+                    print("Request URL: ", url)
+                    response = urllib2.urlopen(url)
+                    with open(name, 'wb') as out_file:
+                        shutil.copyfileobj(response, out_file)
 
-            if update_mp3_tag:
-                self.mp3_tag_update(name, values)
-                print("Successfully MP3 tags updated")
+                    print("Successfully download Song: ", name)
 
-            if enabled_s3_upload:
-                self.upload_to_s3_bucket(name, values['s3_directory'])
+                    if update_mp3_tag:
+                        self.mp3_tag_update(name, values)
+                        print("Successfully MP3 tags updated")
+
+                    if enabled_s3_upload:
+                        self.upload_to_s3_bucket(name, values['s3_directory'])
+                else:
+                    raise e
+            else:
+                print("File already there.. Going to next :)")
 
         except URLError as e:
             if hasattr(e, 'reason'):
