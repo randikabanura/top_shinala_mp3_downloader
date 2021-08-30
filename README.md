@@ -2,7 +2,7 @@
 Song downloader for [TopSinhalaMP3](https://www.topsinhalamp3.com/) and [NewSinhalaMP3](https://www.newsinhalamp3.com/). 
 This program able to download MP3s for particular artist or even all the artist at one go.
 Need `python3` with `bs4`, `urllib` and `shutil` to work. Works in any OS with python3 support.
-These requirements are been taken care of in the installation process.
+These requirements are been taken care of in the installation process. 
 
 ## Installation
 
