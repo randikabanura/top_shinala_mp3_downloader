@@ -3,3 +3,4 @@ urllib3
 eyed3
 tqdm
 boto3
+mysql-connector-python
