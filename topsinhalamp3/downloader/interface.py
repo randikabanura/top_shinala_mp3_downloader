@@ -1,7 +1,7 @@
 from .states import *
 from .consts import *
 from .data_loader import DataLoader
-from tqdm import tqdm
+from progressbar import progressbar
 
 import re
 
@@ -352,7 +352,7 @@ class Interface(object):
         return songs_list
 
     def __download_songs(self, song_list: list = [], song_type: str = 'Artist', folder_prefix: str = ''):
-        for song in tqdm(song_list):
+        for song in progressbar(song_list, redirect_stdout=True):
             song_item = "{} {}".format(folder_prefix, song['item']).strip()
             song_url = song['url']
             song_name = song['song']
