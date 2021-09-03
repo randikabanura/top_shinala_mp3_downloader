@@ -189,7 +189,8 @@ class DataLoader(object):
             'song_url': source_link,
             'song_description': song_description,
             's3_directory': s3_directory,
-            'path': file_name
+            'path': file_name,
+            'type': song_type
         }
 
         self.__download_file(source_link, directory, file_name, song_values)
@@ -331,7 +332,7 @@ class DataLoader(object):
 
             song_file.tag.title = song_values['song_name']
             song_file.tag.album = song_values['artist_name']
-            song_file.tag.album_artist = song_values['artist_name']
+            song_file.tag.album_artist = 'Various Artists' if str(song_values['type']).lower() == 'month' else song_values['artist_name']
             song_file.tag.comments.set(song_values['artist_description'])
 
             song_file.tag.images.remove('AlbumArt')
