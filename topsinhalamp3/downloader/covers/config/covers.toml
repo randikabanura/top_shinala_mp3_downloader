@@ -1,0 +1,107 @@
+[config]
+output-size = 800
+
+[[cover]]
+main-text = "Yamaoka Work"
+bg-image = "sh-toilet2.jpg"
+colour-gradient = "pale-wood"
+gradient-opacity = 30
+do-not-greyscale = true
+font-colour = "#E2E2E2"
+logo-opacity = 40
+
+[[cover]]
+main-text = "Triage"
+centre-text = true
+bg-image = "cd-pile.jpg"
+colour-gradient = "lizard"
+use-white-logo = true
+
+[[cover]]
+main-text = "Thumbs Up"
+bg-image = "gpm.png"
+bg-colour = "white"
+colour-gradient = "orange-coral"
+scale = 50
+position = "bottom"
+use-white-logo = true
+
+[[cover]]
+sub-text = "Have yourself a tolerable"
+main-text = "Christmas"
+sub-text-above = true
+bg-image = "christmas-tree.jpg"
+colour-gradient = "christmas"
+do-not-greyscale = true
+gradient-opacity = 30
+centre-text = true
+
+[[cover]]
+bg-image = "wwe-dor.jpg"
+
+[[cover]]
+main-text = "BBQ"
+bg-image = "bbq.jpg"
+
+[[cover]]
+main-text = "Babymetal"
+sub-text = "23/02/2020"
+bg-image = "babymetal.jpg"
+
+[[cover]]
+main-text = "Creeper"
+sub-text = "01/11/2018"
+bg-image = "creeper.jpg"
+logo-opacity = 40
+use-white-logo = true
+colour-gradient = "lizard"
+gradient-opacity = 15
+do-not-greyscale = true
+
+[[cover]]
+main-text = "The Regrettes"
+sub-text = "08/11/2019"
+bg-image = "regrettes.jpg"
+use-white-logo = true
+logo-opacity = 30
+
+[[cover]]
+main-text = "Screaming Females"
+sub-text = "11/09/2018"
+bg-image = "scream.jpg"
+
+[[cover]]
+sub-text = "Google Play Music"
+main-text = "Triage"
+sub-text-above = true
+bg-image = "cd-pile.jpg"
+colour-gradient = "orange-coral"
+centre-text = true
+
+[[cover]]
+sub-text = "Christmas"
+main-text = "Triage"
+sub-text-above = true
+bg-image = "christmasmusic-2.jpg"
+colour-gradient = "christmas"
+centre-text = true
+
+[[cover]]
+sub-text = "Alex's Drum Stream"
+main-text = "Extra Life 2016"
+bg-image = "alex.jpeg"
+centre-text = true
+colour-gradient = "PureLust"
+gradient-opacity = 15
+use-white-logo = true
+logo-opacity = 30
+
+[[cover]]
+main-text = "Landfill Indie"
+sub-text = "Top 50"
+bg-image = "landfill.png"
+font-colour = "#000000"
+sub-font-colour = "#000000"
+bg-colour = "white"
+scale = 100
+position = "bottom"

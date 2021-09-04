@@ -4,3 +4,6 @@ eyed3
 boto3
 mysql-connector-python
 progressbar2
+pillow
+tomlkit
+pathvalidate
