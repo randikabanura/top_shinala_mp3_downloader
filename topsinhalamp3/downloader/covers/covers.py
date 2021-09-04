@@ -1,9 +1,10 @@
-#!/usr/bin/python
+import shutil
 
 from PIL import Image, ImageOps, ImageFont, ImageDraw
 from tomlkit import loads
-from .utils import get_project_root
+from .utils import get_covers_root, get_downloader_root
 from pathvalidate import sanitize_filename
+import urllib.request as urllib2
 import time
 import sys
 import os
@@ -105,19 +106,19 @@ def calculate_centred_font_location(output_size, font, main_text_line, draw):
 
 
 def get_test_image_1():
-    return Image.open(os.path.join(get_project_root(), 'images', 'test', 'test_1.jpg'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'test', 'test_1.jpg'))
 
 
 def get_test_image_1_solid():
-    return Image.open(os.path.join(get_project_root(), 'images', 'test', 'test_1_solid.jpg'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'test', 'test_1_solid.jpg'))
 
 
 def get_test_image_2():
-    return Image.open(os.path.join(get_project_root(), 'images', 'test', 'test_2.jpg'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'test', 'test_2.jpg'))
 
 
 def get_test_image_3():
-    return Image.open(os.path.join(get_project_root(), 'images', 'test', 'test_3.jpg'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'test', 'test_3.jpg'))
 
 
 def get_test_image(output_size, test):
@@ -132,19 +133,19 @@ def get_test_image(output_size, test):
 
 
 def get_white_logo():
-    return Image.open(os.path.join(get_project_root(), 'images', 'logo', 'Spotify_Icon_RGB_White.png'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'logo', 'Spotify_Icon_RGB_White.png'))
 
 
 def get_black_logo():
-    return Image.open(os.path.join(get_project_root(), 'images', 'logo', 'Spotify_Icon_RGB_Black.png'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'logo', 'Spotify_Icon_RGB_Black.png'))
 
 
 def get_gradient(gradient_name):
-    return Image.open(os.path.join(get_project_root(), 'images', 'gradient', gradient_name + '.jpg'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'gradient', gradient_name + '.jpg'))
 
 
 def get_cover_image(cover):
-    return Image.open(os.path.join(get_project_root(), 'images', cover['bg-image']))
+    return Image.open(os.path.join(get_covers_root(), cover['bg-image']))
 
 
 # def show():
@@ -167,11 +168,31 @@ def get_cover_image(cover):
 #     main(show=True, test="3")
 
 
-def generate_covers(show=False, test=""):
+def generate_covers(show=False, test="", url=None):
     start_time = time.time()
 
+    try:
+        if url is not None:
+            print("Request image URL: ", url)
+            artwork_image_download_path = os.path.join(get_covers_root(), 'artwork.jpg')
+            response = urllib2.urlopen(url)
+            with open(artwork_image_download_path, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+
+            print("Successfully image downloaded")
+        else:
+            default_artwork_image_path = os.path.join(get_downloader_root(), 'resources', 'artwork.jpg')
+            if os.path.isfile(default_artwork_image_path):
+                shutil.copyfileobj(default_artwork_image_path, get_covers_root())
+
+    except:
+        print("Unable to load image. Will be using default artwork")
+        default_artwork_image_path = os.path.join(get_downloader_root(), 'resources', 'artwork.jpg')
+        if os.path.isfile(default_artwork_image_path):
+            shutil.copy(default_artwork_image_path, get_covers_root())
+
     doc = loads(open(
-        os.path.join(get_project_root(),'config.toml'), ).read())
+        os.path.join(get_covers_root(), 'config.toml'), ).read())
 
     output_size = (doc['config']['output-size'], doc['config']['output-size'])
 
@@ -293,8 +314,8 @@ def generate_covers(show=False, test=""):
         if show:
             cover_image.show()
         else:
-            if not os.path.exists(os.path.join(get_project_root(), 'generated')):
-                os.makedirs(os.path.join(get_project_root(), 'generated'))
+            if not os.path.exists(os.path.join(get_covers_root(), 'generated')):
+                os.makedirs(os.path.join(get_covers_root(), 'generated'))
 
             # Ensure unique filenames by first trying to append config strings, then appending numbers if the file
             # still exists already
@@ -304,7 +325,7 @@ def generate_covers(show=False, test=""):
             file_name = ""
             while i < len(parts):
                 file_name += parts[i]
-                file_path = os.path.join(get_project_root(), 'generated', sanitize_filename(file_name + ".jpg"))
+                file_path = os.path.join(get_covers_root(), 'generated', sanitize_filename(file_name + ".jpg"))
                 if os.path.exists(file_path) and os.path.getmtime(file_path) > start_time:
                     i += 1
                     file_name += "_"
@@ -314,7 +335,7 @@ def generate_covers(show=False, test=""):
                 x = 0
                 while os.path.exists(file_path) and os.path.getmtime(file_path) > start_time:
                     x += 1
-                    file_path = os.path.join(get_project_root(), 'generated',
+                    file_path = os.path.join(get_covers_root(), 'generated',
                                              sanitize_filename(file_name + str(x) + ".jpg"))
 
             cover_image.convert("RGB").save(file_path, quality=95)

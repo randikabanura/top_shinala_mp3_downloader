@@ -16,6 +16,7 @@ songs_per_page = 50
 # Download configs
 file_download_path = './downloads'
 update_mp3_tag = True
+cover_art_generation = True
 
 # Database configs
 database_enabled = False

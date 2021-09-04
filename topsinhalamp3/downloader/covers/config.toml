@@ -7,6 +7,7 @@ gradient-opacity = 30
 main-text = "Rahasin Wage "
 sub-text = "Olu Wasanthi"
 sub-text-above = true
+logo-opacity = 70
 
 [config]
 output-size = 800

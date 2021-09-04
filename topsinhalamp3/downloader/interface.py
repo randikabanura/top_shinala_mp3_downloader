@@ -357,10 +357,11 @@ class Interface(object):
             song_url = song['url']
             song_name = song['song']
             song_item_url = song['item_url']
+            song_image_url = song['image_url']
 
             print("Song download: Item:", song_item, "Song:", song_name)
             if song_url is not None:
-                self.__data_loader.download_file_from_url(song_url, song_name, song_item, song_item_url, song_type)
+                self.__data_loader.download_file_from_url(song_url, song_name, song_item, song_item_url, song_type, song_image_url)
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()

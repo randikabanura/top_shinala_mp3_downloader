@@ -24,3 +24,4 @@ MANIFEST
 __pycache__/
 *.py[cod]
 *$py.class
+/topsinhalamp3/downloader/covers/generated/

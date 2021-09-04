@@ -4,6 +4,8 @@ import boto3
 import toml
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
+from pathvalidate import sanitize_filename
+
 from .consts import *
 import shutil
 from urllib.error import URLError
@@ -143,7 +145,8 @@ class DataLoader(object):
         if not keep_local_file_after_download:
             os.remove(path)
 
-    def download_file_from_url(self, url: str, name: str, artist: str, item_url: str, song_type: str = 'Artist'):
+    def download_file_from_url(self, url: str, name: str, artist: str, item_url: str, song_type: str = 'Artist',
+                               song_image_url: str = None):
         self.set_soup(url)
 
         if song_type.lower() == 'month':
@@ -192,7 +195,8 @@ class DataLoader(object):
             'song_description': song_description,
             's3_directory': s3_directory,
             'path': file_name,
-            'type': song_type
+            'type': song_type,
+            'image_url': song_image_url
         }
 
         self.__download_file(source_link, directory, file_name, song_values)
@@ -283,6 +287,15 @@ class DataLoader(object):
         self.set_soup(url)
         songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         songs_list = []
+        if cover_art_generation:
+            print("Please enter a url for a image (Otherwise default image will be used)")
+            image_url = input('>>> ').lower()
+        else:
+            image_url = None
+
+        if image_url.strip() == '' or image_url is None:
+            image_url = None
+
         for i, song in enumerate(songs_name_list):
             print('Song Name: ', song.text)
 
@@ -292,7 +305,8 @@ class DataLoader(object):
                 'item': artist,
                 'item_url': url,
                 'song': song.text,
-                'url': base_url + song.get('href').split('/', 1)[-1]
+                'url': base_url + song.get('href').split('/', 1)[-1],
+                'image_url': image_url
             }
 
             if song_type.lower() == 'month':
@@ -328,8 +342,9 @@ class DataLoader(object):
     def mp3_tag_update(self, path: str, song_values: dict):
         song_file = eyed3.load(path)
 
-        self.update_covers_config(song_values)
-        generate_covers()
+        if cover_art_generation:
+            self.update_covers_config(song_values)
+            generate_covers(url=song_values['image_url'])
 
         if song_file is not None:
             if song_file.tag is None:
@@ -342,8 +357,18 @@ class DataLoader(object):
             song_file.tag.comments.set(song_values['artist_description'])
 
             song_file.tag.images.remove('AlbumArt')
-            song_file.tag.images.set(3, resource_stream(__name__, 'resources/artwork.jpg').read(), 'image/jpeg',
-                                     'AlbumArt')
+
+            cover_art_image_path = 'covers/generated/{}'.format(
+                sanitize_filename(str(song_values['song_name']).split("(")[0].strip() + ".jpg"))
+            cover_art_path = os.path.join(os.path.dirname(__file__), cover_art_image_path)
+
+            if cover_art_generation and os.path.exists(cover_art_path):
+                song_file.tag.images.set(3, resource_stream(__name__, cover_art_image_path).read(), 'image/jpeg',
+                                         'AlbumArt')
+            else:
+                print("Custom cover art does not exists. Using the default cover art")
+                song_file.tag.images.set(3, resource_stream(__name__, 'resources/artwork.jpg').read(), 'image/jpeg',
+                                         'AlbumArt')
 
             song_file.tag.save()
 
@@ -356,9 +381,10 @@ class DataLoader(object):
                     "colour-gradient": "5",
                     "do-not-greyscale": True,
                     "gradient-opacity": 30,
-                    "main-text": str(song_values['song_name']).split("(")[0],
-                    "sub-text": str(song_values['artist_name']).split("(")[0],
-                    "sub-text-above": True
+                    "main-text": str(song_values['song_name']).split("(")[0].strip(),
+                    "sub-text": str(song_values['artist_name']).split("(")[0].strip(),
+                    "sub-text-above": True,
+                    "logo-opacity": 70
                 }
             ],
             "config": {
