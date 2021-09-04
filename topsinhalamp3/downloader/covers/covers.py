@@ -2,7 +2,7 @@
 
 from PIL import Image, ImageOps, ImageFont, ImageDraw
 from tomlkit import loads
-from utils import get_project_root
+from .utils import get_project_root
 from pathvalidate import sanitize_filename
 import time
 import sys
@@ -147,31 +147,31 @@ def get_cover_image(cover):
     return Image.open(os.path.join(get_project_root(), 'images', cover['bg-image']))
 
 
-def show():
-    main(show=True)
+# def show():
+#     main(show=True)
+#
+#
+# def test1():
+#     main(show=True, test="1")
+#
+#
+# def test1_solid():
+#     main(show=True, test="1-solid")
+#
+#
+# def test2():
+#     main(show=True, test="2")
+#
+#
+# def test3():
+#     main(show=True, test="3")
 
 
-def test1():
-    main(show=True, test="1")
-
-
-def test1_solid():
-    main(show=True, test="1-solid")
-
-
-def test2():
-    main(show=True, test="2")
-
-
-def test3():
-    main(show=True, test="3")
-
-
-def main(show=False, test=""):
+def generate_covers(show=False, test=""):
     start_time = time.time()
 
     doc = loads(open(
-        os.path.join(get_project_root(), 'config', 'covers.toml'), ).read())
+        os.path.join(get_project_root(),'config.toml'), ).read())
 
     output_size = (doc['config']['output-size'], doc['config']['output-size'])
 
@@ -321,7 +321,3 @@ def main(show=False, test=""):
 
         if test_image is not None:
             Image.blend(cover_image, test_image, 0.65).show()
-
-
-if __name__ == "__main__":
-    main()

@@ -1,6 +1,7 @@
 import urllib.request as urllib2
 import urllib.parse as urlparse
 import boto3
+import toml
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
 from .consts import *
@@ -10,6 +11,7 @@ import os
 import eyed3
 from pkg_resources import resource_stream
 
+from .covers.covers import generate_covers
 from .database.song_reg import SongREG
 
 
@@ -325,6 +327,34 @@ class DataLoader(object):
 
     def mp3_tag_update(self, path: str, song_values: dict):
         song_file = eyed3.load(path)
+
+        data = {
+            "cover": [
+                {
+                    "bg-image": "christmas-tree.jpg",
+                    "centre-text": True,
+                    "colour-gradient": "christmas",
+                    "do-not-greyscale": True,
+                    "gradient-opacity": 30,
+                    "main-text": "Christmas",
+                    "sub-text": "Have yourself a tolerable",
+                    "sub-text-above": True
+                }
+            ],
+            "config": {
+                "output-size": 800
+            }
+        }
+
+        toml_string = toml.dumps(data)  # Output to a string
+
+        current_path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(current_path, "covers/config.toml")
+        print(path)
+        with open(path, "w") as toml_file:
+            toml.dump(data, toml_file)
+
+        generate_covers()
 
         if song_file is not None:
             if song_file.tag is None:

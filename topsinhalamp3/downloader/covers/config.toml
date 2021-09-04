@@ -1,0 +1,12 @@
+[[cover]]
+bg-image = "christmas-tree.jpg"
+centre-text = true
+colour-gradient = "christmas"
+do-not-greyscale = true
+gradient-opacity = 30
+main-text = "Christmas"
+sub-text = "Have yourself a tolerable"
+sub-text-above = true
+
+[config]
+output-size = 800
