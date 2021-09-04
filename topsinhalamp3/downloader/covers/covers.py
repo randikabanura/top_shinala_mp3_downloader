@@ -293,8 +293,8 @@ def generate_covers(show=False, test=""):
         if show:
             cover_image.show()
         else:
-            if not os.path.exists(os.path.join(get_project_root(), 'images', 'covers')):
-                os.makedirs(os.path.join(get_project_root(), 'images', 'covers'))
+            if not os.path.exists(os.path.join(get_project_root(), 'generated')):
+                os.makedirs(os.path.join(get_project_root(), 'generated'))
 
             # Ensure unique filenames by first trying to append config strings, then appending numbers if the file
             # still exists already
@@ -304,7 +304,7 @@ def generate_covers(show=False, test=""):
             file_name = ""
             while i < len(parts):
                 file_name += parts[i]
-                file_path = os.path.join(get_project_root(), 'images', 'covers', sanitize_filename(file_name + ".jpg"))
+                file_path = os.path.join(get_project_root(), 'generated', sanitize_filename(file_name + ".jpg"))
                 if os.path.exists(file_path) and os.path.getmtime(file_path) > start_time:
                     i += 1
                     file_name += "_"
@@ -314,7 +314,7 @@ def generate_covers(show=False, test=""):
                 x = 0
                 while os.path.exists(file_path) and os.path.getmtime(file_path) > start_time:
                     x += 1
-                    file_path = os.path.join(get_project_root(), 'images', 'covers',
+                    file_path = os.path.join(get_project_root(), 'generated',
                                              sanitize_filename(file_name + str(x) + ".jpg"))
 
             cover_image.convert("RGB").save(file_path, quality=95)

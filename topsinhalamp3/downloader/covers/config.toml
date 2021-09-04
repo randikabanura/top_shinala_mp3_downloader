@@ -1,11 +1,11 @@
 [[cover]]
-bg-image = "christmas-tree.jpg"
+bg-image = "artwork.jpg"
 centre-text = true
-colour-gradient = "christmas"
+colour-gradient = "5"
 do-not-greyscale = true
 gradient-opacity = 30
-main-text = "Christmas"
-sub-text = "Have yourself a tolerable"
+main-text = "Rahasin Wage "
+sub-text = "Olu Wasanthi"
 sub-text-above = true
 
 [config]

@@ -328,32 +328,7 @@ class DataLoader(object):
     def mp3_tag_update(self, path: str, song_values: dict):
         song_file = eyed3.load(path)
 
-        data = {
-            "cover": [
-                {
-                    "bg-image": "christmas-tree.jpg",
-                    "centre-text": True,
-                    "colour-gradient": "christmas",
-                    "do-not-greyscale": True,
-                    "gradient-opacity": 30,
-                    "main-text": "Christmas",
-                    "sub-text": "Have yourself a tolerable",
-                    "sub-text-above": True
-                }
-            ],
-            "config": {
-                "output-size": 800
-            }
-        }
-
-        toml_string = toml.dumps(data)  # Output to a string
-
-        current_path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(current_path, "covers/config.toml")
-        print(path)
-        with open(path, "w") as toml_file:
-            toml.dump(data, toml_file)
-
+        self.update_covers_config(song_values)
         generate_covers()
 
         if song_file is not None:
@@ -362,7 +337,8 @@ class DataLoader(object):
 
             song_file.tag.title = song_values['song_name']
             song_file.tag.album = song_values['artist_name']
-            song_file.tag.album_artist = 'Various Artists' if str(song_values['type']).lower() == 'month' else song_values['artist_name']
+            song_file.tag.album_artist = 'Various Artists' if str(song_values['type']).lower() == 'month' else \
+                song_values['artist_name']
             song_file.tag.comments.set(song_values['artist_description'])
 
             song_file.tag.images.remove('AlbumArt')
@@ -370,3 +346,28 @@ class DataLoader(object):
                                      'AlbumArt')
 
             song_file.tag.save()
+
+    def update_covers_config(self, song_values: dict):
+        data = {
+            "cover": [
+                {
+                    "bg-image": "artwork.jpg",
+                    "centre-text": True,
+                    "colour-gradient": "5",
+                    "do-not-greyscale": True,
+                    "gradient-opacity": 30,
+                    "main-text": str(song_values['song_name']).split("(")[0],
+                    "sub-text": str(song_values['artist_name']).split("(")[0],
+                    "sub-text-above": True
+                }
+            ],
+            "config": {
+                "output-size": 800
+            }
+        }
+
+        current_path = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(current_path, "covers/config.toml")
+
+        with open(path, "w") as toml_file:
+            toml.dump(data, toml_file)
