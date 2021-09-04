@@ -288,8 +288,8 @@ class DataLoader(object):
         songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         songs_list = []
         if cover_art_generation:
-            print("Please enter a url for a image (Otherwise default image will be used)")
-            image_url = input('>>> ').lower()
+            print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(artist))
+            image_url = input('>>> ')
         else:
             image_url = None
 
