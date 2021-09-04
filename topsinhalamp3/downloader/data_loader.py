@@ -1,3 +1,4 @@
+import random
 import urllib.request as urllib2
 import urllib.parse as urlparse
 import boto3
@@ -373,12 +374,21 @@ class DataLoader(object):
             song_file.tag.save()
 
     def update_covers_config(self, song_values: dict):
+        current_path = os.path.abspath(os.path.dirname(__file__))
+
+        gradient_path = os.path.join(current_path, 'covers/images/gradient')
+        gradient_count = 0
+        random_gradient = None
+        if os.path.exists(gradient_path):
+            gradient_count = len([name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
+            random_gradient = random.randrange(1, gradient_count)
+
         data = {
             "cover": [
                 {
                     "bg-image": "artwork.jpg",
                     "centre-text": True,
-                    "colour-gradient": "5",
+                    "colour-gradient": "{}".format(random_gradient),
                     "do-not-greyscale": True,
                     "gradient-opacity": 30,
                     "main-text": str(song_values['song_name']).split("(")[0].strip(),
@@ -392,8 +402,8 @@ class DataLoader(object):
             }
         }
 
-        current_path = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(current_path, "covers/config.toml")
 
-        with open(path, "w") as toml_file:
+        config_path = os.path.join(current_path, "covers/config.toml")
+
+        with open(config_path, "w") as toml_file:
             toml.dump(data, toml_file)
