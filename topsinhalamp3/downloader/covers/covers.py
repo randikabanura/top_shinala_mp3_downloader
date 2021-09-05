@@ -176,7 +176,10 @@ def generate_covers(show=False, test="", url=None):
         if url is not None:
             print("Request image URL: ", url)
             artwork_image_download_path = os.path.join(get_covers_root(), 'artwork.jpg')
-            response = urllib2.urlopen(url)
+
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            request = urllib2.Request(url, None, headers)
+            response = urllib2.urlopen(request)
             with open(artwork_image_download_path, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
 
