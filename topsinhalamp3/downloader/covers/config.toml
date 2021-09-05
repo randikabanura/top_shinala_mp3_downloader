@@ -1,13 +1,2 @@
-[[cover]]
-bg-image = "artwork.jpg"
-centre-text = true
-colour-gradient = "4"
-do-not-greyscale = true
-gradient-opacity = 30
-main-text = "Ganga Addara Ma"
-sub-text = "Oshan Kumarathunga"
-sub-text-above = true
-logo-opacity = 70
-
 [config]
 output-size = 800

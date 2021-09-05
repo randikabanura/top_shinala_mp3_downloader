@@ -319,7 +319,7 @@ def generate_covers(show=False, test="", url=None):
 
             # Ensure unique filenames by first trying to append config strings, then appending numbers if the file
             # still exists already
-            parts = [cover.get('main-text'), cover.get('sub-text'), cover.get('bg-image'), cover.get('colour-gradient')]
+            parts = ["{}-{}".format(cover.get('main-text'), cover.get('sub-text')), cover.get('bg-image'), cover.get('colour-gradient')]
             parts = [i for i in parts if i is not None]
             i = 0
             file_name = ""

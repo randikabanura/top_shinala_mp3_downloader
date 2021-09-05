@@ -360,7 +360,8 @@ class DataLoader(object):
             song_file.tag.images.remove('AlbumArt')
 
             cover_art_image_path = 'covers/generated/{}'.format(
-                sanitize_filename(str(song_values['song_name']).split("(")[0].strip() + ".jpg"))
+                sanitize_filename("{}-{}{}".format(str(song_values['song_name']).split("(")[0].strip(),
+                                                   str(song_values['artist_name']).split("(")[0].strip(), ".jpg")))
             cover_art_path = os.path.join(os.path.dirname(__file__), cover_art_image_path)
 
             if cover_art_generation and os.path.exists(cover_art_path):
@@ -379,7 +380,8 @@ class DataLoader(object):
         gradient_path = os.path.join(current_path, 'covers/images/gradient')
         random_gradient = None
         if os.path.exists(gradient_path):
-            gradient_count = len([name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
+            gradient_count = len(
+                [name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
             random_gradient = random.randint(1, gradient_count)
 
         data = {
@@ -400,7 +402,6 @@ class DataLoader(object):
                 "output-size": 800
             }
         }
-
 
         config_path = os.path.join(current_path, "covers/config.toml")
 
