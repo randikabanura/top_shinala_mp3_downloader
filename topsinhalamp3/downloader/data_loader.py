@@ -374,6 +374,10 @@ class DataLoader(object):
 
             song_file.tag.save()
 
+            if cover_art_delete_after_attached and os.path.exists(cover_art_path):
+                os.remove(cover_art_path)
+
+
     def update_covers_config(self, song_values: dict):
         current_path = os.path.abspath(os.path.dirname(__file__))
 
@@ -383,6 +387,7 @@ class DataLoader(object):
             gradient_count = len(
                 [name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
             random_gradient = random.randint(1, gradient_count)
+            print("Random gradient chosen: {}, gradient count: {}".format(random_gradient, gradient_count))
 
         data = {
             "cover": [

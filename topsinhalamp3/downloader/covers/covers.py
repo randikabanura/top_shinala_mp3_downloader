@@ -8,6 +8,7 @@ import urllib.request as urllib2
 import time
 import sys
 import os
+import textwrap as tr
 
 logo_padding_percentage = 3.865
 logo_size_percentage = 7.4
@@ -263,7 +264,7 @@ def generate_covers(show=False, test="", url=None):
                 font = ImageFont.truetype('CircularStd-Bold.otf', size)
                 max_area = get_text_area(output_size)
                 max_height = get_text_height(output_size)
-                main_text_line = cover.get('main-text')
+                main_text_line = tr.fill(cover.get('main-text'), 20)
                 # Calculate maximum font size. Increase size until width of text exceeds defined max area,
                 # or height of an example text with no dangling letters, e.g. "Genre Glitch", at that size
                 # exceeds defined maximum.
