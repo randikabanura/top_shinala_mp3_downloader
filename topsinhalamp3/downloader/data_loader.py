@@ -377,11 +377,10 @@ class DataLoader(object):
         current_path = os.path.abspath(os.path.dirname(__file__))
 
         gradient_path = os.path.join(current_path, 'covers/images/gradient')
-        gradient_count = 0
         random_gradient = None
         if os.path.exists(gradient_path):
             gradient_count = len([name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
-            random_gradient = random.randrange(1, gradient_count)
+            random_gradient = random.randint(1, gradient_count)
 
         data = {
             "cover": [
