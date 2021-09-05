@@ -174,10 +174,13 @@ class Interface(object):
 
         if artist_index is None:
             print("Input is not correct. Number:", artist_index)
-            self.__artist_name_letter = None
             return
         else:
-            artist_index = int(artist_index)
+            try:
+                artist_index = int(artist_index)
+            except:
+                print("Input is not correct. Enter a number")
+                return
 
         if letter is not None:
             matches = re.match(artist_letter_based_regex, letter, re.MULTILINE)
