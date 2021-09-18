@@ -284,17 +284,18 @@ class DataLoader(object):
         return artist_list
 
     def get_songs_list_from_url(self, url: str, artist: str, get_next_page: bool = True, page: int = 1,
-                                song_type: str = 'Artist'):
+                                song_type: str = 'Artist', image_url: str = ''):
         self.set_soup(url)
         songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         songs_list = []
         if cover_art_generation:
-            print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(artist))
-            image_url = input('>>> ')
+            if page == 1:
+                print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(artist))
+                image_url = input('>>> ')
         else:
             image_url = None
 
-        if image_url.strip() == '' or image_url is None:
+        if image_url is None or image_url.strip() == '':
             image_url = None
 
         for i, song in enumerate(songs_name_list):
@@ -333,7 +334,7 @@ class DataLoader(object):
 
                 next_page_no = int(next_page.text)
                 next_page_songs_list = self.get_songs_list_from_url(next_page_url, artist, False, next_page_no,
-                                                                    song_type)
+                                                                    song_type, image_url)
 
                 for next_page_name in next_page_songs_list:
                     songs_list.append(next_page_name)
@@ -376,7 +377,6 @@ class DataLoader(object):
 
             if cover_art_delete_after_attached and os.path.exists(cover_art_path):
                 os.remove(cover_art_path)
-
 
     def update_covers_config(self, song_values: dict):
         current_path = os.path.abspath(os.path.dirname(__file__))
