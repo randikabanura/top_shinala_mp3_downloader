@@ -61,7 +61,7 @@ class DataLoader(object):
                 print("Database is not enabled")
                 downloadable = True
 
-            if not downloadable or os.path.isfile(name):
+            if (not downloadable or os.path.isfile(name)) and force_downloadable is False:
                 print("File already there.. Going to next :)")
                 return
             else:
@@ -106,8 +106,22 @@ class DataLoader(object):
                 else:
                     raise e
             else:
-                if enabled_s3_upload:
+                if enabled_s3_upload and force_downloadable is False:
                     print("File already there.. Going to next :)")
+                else:
+                    print("Request URL: ", url)
+                    response = urllib2.urlopen(url)
+                    with open(name, 'wb') as out_file:
+                        shutil.copyfileobj(response, out_file)
+
+                    print("Successfully download Song: ", name)
+
+                    if update_mp3_tag:
+                        self.mp3_tag_update(name, values)
+                        print("Successfully MP3 tags updated")
+
+                    if enabled_s3_upload:
+                        self.upload_to_s3_bucket(name, values['s3_directory'])
 
         except URLError as e:
             if hasattr(e, 'reason'):
@@ -138,7 +152,11 @@ class DataLoader(object):
                 else:
                     raise e
             else:
-                print('File already exists')
+                if force_downloadable is False:
+                    print('File already exists')
+                else:
+                    client.upload_file(path, bucket_name, s3_directory)
+                    print('Upload to S3 successful')
 
         except Exception as e:
             print("Upload unsuccessful. Error Occurred. Reason:\n", e)
