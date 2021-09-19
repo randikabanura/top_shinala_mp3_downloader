@@ -213,7 +213,7 @@ class DataLoader(object):
 
             file_name = "{}/{}{}".format(directory, name, '.mp3')
             s3_directory = "{}/{}{}".format(s3_directory_format, name, '.mp3')
-            s3_folder_image_directory = "{}/".format(s3_directory_format, 'folder.jpg')
+            s3_folder_image_directory = "{}/{}".format(s3_directory_format, 'folder.jpg')
 
             directory = os.path.expandvars(directory)
             file_name = os.path.expandvars(file_name)
