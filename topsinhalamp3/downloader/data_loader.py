@@ -344,9 +344,21 @@ class DataLoader(object):
     def mp3_tag_update(self, path: str, song_values: dict):
         song_file = eyed3.load(path)
 
-        if cover_art_generation:
+        if cover_art_only_album:
+            cover_art_image_path = 'covers/generated/{}'.format(
+                sanitize_filename("{}-{}{}".format(str(song_values['artist_name']).split("(")[0].strip(), "Musify", ".jpg")))
+        else:
+            cover_art_image_path = 'covers/generated/{}'.format(
+                sanitize_filename("{}-{}{}".format(str(song_values['song_name']).split("(")[0].strip(),
+                                                   str(song_values['artist_name']).split("(")[0].strip(), ".jpg")))
+
+        cover_art_path = os.path.join(os.path.dirname(__file__), cover_art_image_path)
+
+        if cover_art_generation and (os.path.exists(cover_art_path) is False):
             self.update_covers_config(song_values)
             generate_covers(url=song_values['image_url'])
+        elif os.path.exists(cover_art_path):
+            print("Cover Art already exists")
 
         if song_file is not None:
             if song_file.tag is None:
@@ -358,24 +370,20 @@ class DataLoader(object):
                 song_values['artist_name']
             song_file.tag.comments.set(song_values['artist_description'])
 
+            song_file.tag.images.remove('CoverArt')
             song_file.tag.images.remove('AlbumArt')
-
-            cover_art_image_path = 'covers/generated/{}'.format(
-                sanitize_filename("{}-{}{}".format(str(song_values['song_name']).split("(")[0].strip(),
-                                                   str(song_values['artist_name']).split("(")[0].strip(), ".jpg")))
-            cover_art_path = os.path.join(os.path.dirname(__file__), cover_art_image_path)
 
             if cover_art_generation and os.path.exists(cover_art_path):
                 song_file.tag.images.set(3, resource_stream(__name__, cover_art_image_path).read(), 'image/jpeg',
-                                         'AlbumArt')
+                                         'CoverArt')
             else:
                 print("Custom cover art does not exists. Using the default cover art")
                 song_file.tag.images.set(3, resource_stream(__name__, 'resources/artwork.jpg').read(), 'image/jpeg',
-                                         'AlbumArt')
+                                         'CoverArt')
 
             song_file.tag.save()
 
-            if cover_art_delete_after_attached and os.path.exists(cover_art_path):
+            if cover_art_delete_after_attached and os.path.exists(cover_art_path) and (cover_art_only_album is False):
                 os.remove(cover_art_path)
 
     def update_covers_config(self, song_values: dict):
@@ -388,25 +396,44 @@ class DataLoader(object):
                 [name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
             random_gradient = random.randint(1, gradient_count)
             print("Random gradient chosen: {}, gradient count: {}".format(random_gradient, gradient_count))
-
-        data = {
-            "cover": [
-                {
-                    "bg-image": "artwork.jpg",
-                    "centre-text": True,
-                    "colour-gradient": "{}".format(random_gradient),
-                    "do-not-greyscale": True,
-                    "gradient-opacity": 30,
-                    "main-text": str(song_values['song_name']).split("(")[0].strip(),
-                    "sub-text": str(song_values['artist_name']).split("(")[0].strip(),
-                    "sub-text-above": True,
-                    "logo-opacity": 70
+        if cover_art_only_album:
+            data = {
+                "cover": [
+                    {
+                        "bg-image": "artwork.jpg",
+                        "centre-text": True,
+                        "colour-gradient": "{}".format(random_gradient),
+                        "do-not-greyscale": True,
+                        "gradient-opacity": 30,
+                        "main-text": str(song_values['artist_name']).split("(")[0].strip(),
+                        "sub-text": "Musify",
+                        "sub-text-above": True,
+                        "logo-opacity": 70
+                    }
+                ],
+                "config": {
+                    "output-size": 800
                 }
-            ],
-            "config": {
-                "output-size": 800
             }
-        }
+        else:
+            data = {
+                "cover": [
+                    {
+                        "bg-image": "artwork.jpg",
+                        "centre-text": True,
+                        "colour-gradient": "{}".format(random_gradient),
+                        "do-not-greyscale": True,
+                        "gradient-opacity": 30,
+                        "main-text": str(song_values['song_name']).split("(")[0].strip(),
+                        "sub-text": str(song_values['artist_name']).split("(")[0].strip(),
+                        "sub-text-above": True,
+                        "logo-opacity": 70
+                    }
+                ],
+                "config": {
+                    "output-size": 800
+                }
+            }
 
         config_path = os.path.join(current_path, "covers/config.toml")
 

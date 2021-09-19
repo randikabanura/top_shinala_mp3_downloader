@@ -17,6 +17,7 @@ songs_per_page = 50
 file_download_path = './downloads'
 update_mp3_tag = True
 cover_art_generation = True
+cover_art_only_album = True
 cover_art_delete_after_attached = True
 
 # Database configs
