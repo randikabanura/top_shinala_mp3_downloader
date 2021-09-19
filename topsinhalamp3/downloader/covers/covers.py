@@ -134,11 +134,11 @@ def get_test_image(output_size, test):
 
 
 def get_white_logo():
-    return Image.open(os.path.join(get_covers_root(), 'images', 'logo', 'Spotify_Icon_RGB_White.png'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'logo', 'logo_white.png'))
 
 
 def get_black_logo():
-    return Image.open(os.path.join(get_covers_root(), 'images', 'logo', 'Spotify_Icon_RGB_Black.png'))
+    return Image.open(os.path.join(get_covers_root(), 'images', 'logo', 'logo_gold.png'))
 
 
 def get_gradient(gradient_name):
