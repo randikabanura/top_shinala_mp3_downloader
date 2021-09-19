@@ -215,7 +215,8 @@ class DataLoader(object):
             's3_directory': s3_directory,
             'path': file_name,
             'type': song_type,
-            'image_url': song_image_url
+            'image_url': song_image_url,
+            'directory': directory
         }
 
         self.__download_file(source_link, directory, file_name, song_values)
@@ -374,9 +375,12 @@ class DataLoader(object):
 
         if cover_art_generation and (os.path.exists(cover_art_path) is False):
             self.update_covers_config(song_values)
-            generate_covers(url=song_values['image_url'])
+            generate_covers(song_values=song_values)
         elif os.path.exists(cover_art_path):
             print("Cover Art already exists")
+            song_directory = os.path.join(song_values['directory'], "folder.jpg")
+            if not os.path.exists(song_directory):
+                shutil.copy(cover_art_path, song_directory)
 
         if song_file is not None:
             if song_file.tag is None:

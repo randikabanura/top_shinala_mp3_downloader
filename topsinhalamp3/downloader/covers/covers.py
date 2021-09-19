@@ -10,6 +10,8 @@ import sys
 import os
 import textwrap as tr
 
+from ..consts import cover_art_only_album
+
 logo_padding_percentage = 3.865
 logo_size_percentage = 7.4
 logo_transparency_percentage = 20
@@ -169,8 +171,10 @@ def get_cover_image(cover):
 #     main(show=True, test="3")
 
 
-def generate_covers(show=False, test="", url=None):
+def generate_covers(show=False, test="", song_values: dict = {}):
     start_time = time.time()
+    url = song_values['image_url']
+    song_directory = song_values['directory']
 
     try:
         if url is not None:
@@ -343,6 +347,11 @@ def generate_covers(show=False, test="", url=None):
                                              sanitize_filename(file_name + str(x) + ".jpg"))
 
             cover_image.convert("RGB").save(file_path, quality=95)
+
+            if cover_art_only_album:
+                song_directory = os.path.join(song_directory, sanitize_filename("folder.jpg"))
+                if not os.path.exists(song_directory):
+                    cover_image.convert("RGB").save(song_directory, quality=95)
 
         if test_image is not None:
             Image.blend(cover_image, test_image, 0.65).show()
