@@ -102,7 +102,7 @@ class DataLoader(object):
                         print("Successfully MP3 tags updated")
 
                     if enabled_s3_upload:
-                        self.upload_to_s3_bucket(name, values['s3_directory'])
+                        self.upload_to_s3_bucket(name, values)
                 else:
                     raise e
             else:
@@ -121,7 +121,7 @@ class DataLoader(object):
                         print("Successfully MP3 tags updated")
 
                     if enabled_s3_upload:
-                        self.upload_to_s3_bucket(name, values['s3_directory'])
+                        self.upload_to_s3_bucket(name, values)
 
         except URLError as e:
             if hasattr(e, 'reason'):
@@ -133,10 +133,15 @@ class DataLoader(object):
         except Exception as e:
             print("Error Occurred. Reason:\n", e)
 
-    def upload_to_s3_bucket(self, path: str, s3_directory: str):
+    def upload_to_s3_bucket(self, path: str, values: dict = {}):
         print('Upload to S3 bucket initiated')
 
         try:
+
+            s3_directory = values['s3_directory']
+            s3_folder_image_directory = values['s3_folder_image_directory']
+            folder_image_directory = os.path.join(values['directory'], "folder.jpg")
+
             session = boto3.session.Session()
             client = session.client('s3',
                                     endpoint_url=bucket_endpoint,
@@ -157,6 +162,17 @@ class DataLoader(object):
                 else:
                     client.upload_file(path, bucket_name, s3_directory)
                     print('Upload to S3 successful')
+
+            try:
+                client.head_object(Bucket=bucket_name, Key=s3_folder_image_directory)
+            except ClientError as e:
+                if e.response['Error']['Code'] == "404":
+                    client.upload_file(folder_image_directory, bucket_name, s3_folder_image_directory)
+                    print('Upload folder image to S3 successful')
+                else:
+                    raise e
+            else:
+                print('File folder image already exists')
 
         except Exception as e:
             print("Upload unsuccessful. Error Occurred. Reason:\n", e)
@@ -197,6 +213,7 @@ class DataLoader(object):
 
             file_name = "{}/{}{}".format(directory, name, '.mp3')
             s3_directory = "{}/{}{}".format(s3_directory_format, name, '.mp3')
+            s3_folder_image_directory = "{}/".format(s3_directory_format, 'folder.jpg')
 
             directory = os.path.expandvars(directory)
             file_name = os.path.expandvars(file_name)
@@ -216,6 +233,7 @@ class DataLoader(object):
             'path': file_name,
             'type': song_type,
             'image_url': song_image_url,
+            's3_folder_image_directory': s3_folder_image_directory,
             'directory': directory
         }
 
@@ -365,7 +383,8 @@ class DataLoader(object):
 
         if cover_art_only_album:
             cover_art_image_path = 'covers/generated/{}'.format(
-                sanitize_filename("{}-{}{}".format(str(song_values['artist_name']).split("(")[0].strip(), "Musify", ".jpg")))
+                sanitize_filename(
+                    "{}-{}{}".format(str(song_values['artist_name']).split("(")[0].strip(), "Musify", ".jpg")))
         else:
             cover_art_image_path = 'covers/generated/{}'.format(
                 sanitize_filename("{}-{}{}".format(str(song_values['song_name']).split("(")[0].strip(),
