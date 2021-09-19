@@ -181,7 +181,14 @@ def generate_covers(show=False, test="", song_values: dict = {}):
             print("Request image URL: ", url)
             artwork_image_download_path = os.path.join(get_covers_root(), 'artwork.jpg')
 
-            headers = {'User-Agent': 'Mozilla/5.0'}
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                                     'AppleWebKit/537.11 (KHTML, like Gecko) '
+                                     'Chrome/23.0.1271.64 Safari/537.11',
+                       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                       'Accept-Encoding': 'none',
+                       'Accept-Language': 'en-US,en;q=0.8',
+                       'Connection': 'keep-alive'}
             request = urllib2.Request(url, None, headers)
             response = urllib2.urlopen(request)
             with open(artwork_image_download_path, 'wb') as out_file:
@@ -327,7 +334,8 @@ def generate_covers(show=False, test="", song_values: dict = {}):
 
             # Ensure unique filenames by first trying to append config strings, then appending numbers if the file
             # still exists already
-            parts = ["{}-{}".format(cover.get('main-text'), cover.get('sub-text')), cover.get('bg-image'), cover.get('colour-gradient')]
+            parts = ["{}-{}".format(cover.get('main-text'), cover.get('sub-text')), cover.get('bg-image'),
+                     cover.get('colour-gradient')]
             parts = [i for i in parts if i is not None]
             i = 0
             file_name = ""
