@@ -10,7 +10,7 @@ import sys
 import os
 import textwrap as tr
 
-from .. import force_downloadable
+from ..consts import force_downloadable
 from ..consts import cover_art_only_album
 
 logo_padding_percentage = 3.865
