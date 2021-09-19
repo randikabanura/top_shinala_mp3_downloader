@@ -10,6 +10,7 @@ import sys
 import os
 import textwrap as tr
 
+from .. import force_downloadable
 from ..consts import cover_art_only_album
 
 logo_padding_percentage = 3.865
@@ -358,7 +359,7 @@ def generate_covers(show=False, test="", song_values: dict = {}):
 
             if cover_art_only_album:
                 song_directory = os.path.join(song_directory, sanitize_filename("folder.jpg"))
-                if not os.path.exists(song_directory):
+                if not os.path.exists(song_directory) or force_downloadable:
                     cover_image.convert("RGB").save(song_directory, quality=95)
 
         if test_image is not None:

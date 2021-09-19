@@ -398,7 +398,7 @@ class DataLoader(object):
         elif os.path.exists(cover_art_path):
             print("Cover Art already exists")
             song_directory = os.path.join(song_values['directory'], "folder.jpg")
-            if not os.path.exists(song_directory):
+            if not os.path.exists(song_directory) or force_downloadable:
                 shutil.copy(cover_art_path, song_directory)
 
         if song_file is not None:
