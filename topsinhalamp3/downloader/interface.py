@@ -404,10 +404,26 @@ class Interface(object):
     def begin(self):
         cmd = 'initial'
         while cmd not in ['exit', 'quit', 'close', 'exit()', 'quit()', 'close()']:
-            if cmd == 'initial' and reset_download_folders_on_startup is True:
-                shutil.rmtree(os.path.join(file_download_path, 'TopSinhalaMP3'))
-                shutil.rmtree(os.path.join(file_download_path, 'NewSinhalaMP3'))
-                shutil.rmtree(os.path.join(get_covers_root(), 'generated'))
+            try:
+                if cmd == 'initial' and reset_download_folders_on_startup is True:
+                    shutil.rmtree(os.path.join(file_download_path, 'TopSinhalaMP3'))
+                    print("Successfully cleared 'TopSinhalaMP3' directory")
+            except Exception:
+                print("Successfully cleared 'TopSinhalaMP3' directory")
+
+            try:
+                if cmd == 'initial' and reset_download_folders_on_startup is True:
+                    shutil.rmtree(os.path.join(file_download_path, 'NewSinhalaMP3'))
+                    print("Successfully cleared 'NewSinhalaMP3' directory")
+            except Exception:
+                print("Successfully cleared 'NewSinhalaMP3' directory")
+
+            try:
+                if cmd == 'initial' and reset_download_folders_on_startup is True:
+                    shutil.rmtree(os.path.join(get_covers_root(), 'generated'))
+                    print("Successfully cleared 'Generated Covers' directory")
+            except Exception:
+                print("Successfully cleared 'Generated Covers' directory")
 
             self.__redirect_to_function(cmd)
             cmd = input('>>> ').lower()
