@@ -15,6 +15,7 @@ songs_per_page = 50
 
 # Download configs
 file_download_path = './downloads'
+reset_download_folders_on_startup = False
 update_mp3_tag = True
 force_downloadable = True
 cover_art_generation = True

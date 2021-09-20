@@ -1,3 +1,7 @@
+import os
+import shutil
+
+from .covers.utils import get_covers_root
 from .states import *
 from .consts import *
 from .data_loader import DataLoader
@@ -400,6 +404,11 @@ class Interface(object):
     def begin(self):
         cmd = 'initial'
         while cmd not in ['exit', 'quit', 'close', 'exit()', 'quit()', 'close()']:
+            if cmd == 'initial':
+                shutil.rmtree(os.path.join(file_download_path, 'TopSinhalaMP3'))
+                shutil.rmtree(os.path.join(file_download_path, 'NewSinhalaMP3'))
+                shutil.rmtree(os.path.join(get_covers_root(), 'generated'))
+
             self.__redirect_to_function(cmd)
             cmd = input('>>> ').lower()
             self.__cmds.append(cmd)
