@@ -276,7 +276,7 @@ def generate_covers(show=False, test="", song_values: dict = {}):
             # Write text
             if cover.get('main-text'):
                 size = 1
-                font = ImageFont.truetype('CircularStd-Bold.otf', size)
+                font = ImageFont.truetype('fonts/CircularStd-Bold.otf', size)
                 max_area = get_text_area(output_size)
                 max_height = get_text_height(output_size)
                 main_text_line = tr.fill(cover.get('main-text'), 20)
@@ -287,7 +287,7 @@ def generate_covers(show=False, test="", song_values: dict = {}):
                 while (draw.textsize(main_text_line, font)[0] < max_area and
                        draw.textsize(text_height_example_string, font)[1] < max_height):
                     size += 1
-                    font = ImageFont.truetype('CircularStd-Bold.otf', size)
+                    font = ImageFont.truetype('fonts/CircularStd-Bold.otf', size)
                 # Put in a variable so sub-text can use to calculate area already covered
                 main_text_size = draw.textsize(main_text_line, font)
                 if cover.get('centre-text'):
@@ -298,7 +298,7 @@ def generate_covers(show=False, test="", song_values: dict = {}):
 
             if cover.get('sub-text'):
                 size = 1
-                font = ImageFont.truetype('CircularStd-Bold.otf', size)
+                font = ImageFont.truetype('fonts/CircularStd-Bold.otf', size)
                 max_area = get_text_area(output_size)
                 max_height = get_sub_text_height(output_size)
                 main_text_line = cover.get('sub-text')
@@ -309,7 +309,7 @@ def generate_covers(show=False, test="", song_values: dict = {}):
                 while (draw.textsize(main_text_line, font)[0] < max_area and
                        draw.textsize(text_height_example_string, font)[1] < max_height):
                     size += 1
-                    font = ImageFont.truetype('CircularStd-Bold.otf', size)
+                    font = ImageFont.truetype('fonts/CircularStd-Bold.otf', size)
                 if cover.get('sub-text-above'):
                     main_start = text_location[1]
                     sub_text_location = (int(output_size[0] / 2 - draw.textsize(main_text_line, font)[0] / 2),
