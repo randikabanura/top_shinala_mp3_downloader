@@ -46,6 +46,10 @@ Please DO NOT change anything except of the following options.
 file_download_path = './downloads' # Can change download location for the files
 update_mp3_tag = True # If you make this false mp3 tags will not be updated.
 database_enabled = False # This need to have the mysql database with same schema provided in ./db folder
+force_downloadable = True
+cover_art_generation = True
+cover_art_only_album = True
+cover_art_delete_after_attached = True
 
 # If you want to upload songs to s3 bucket please configure following options
 enabled_s3_upload = True
