@@ -3,8 +3,8 @@ urllib3
 eyed3
 boto3
 mysql-connector-python
-progressbar2
 pillow
 toml
 tomlkit
 pathvalidate
+alive-progress

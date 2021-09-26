@@ -1,13 +1,8 @@
-import random
 import urllib.request as urllib2
 import urllib.parse as urlparse
 import boto3
-import toml
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
-from pathvalidate import sanitize_filename
-
-from .covers.utils import get_covers_root
 from .consts import *
 import shutil
 from urllib.error import URLError
@@ -17,6 +12,7 @@ from pkg_resources import resource_stream
 
 from .covers.covers import generate_covers
 from .database.song_reg import SongREG
+from .utils import get_cover_art_image_path, get_cover_art_from_s3, update_covers_config
 
 
 class DataLoader(object):
@@ -180,11 +176,10 @@ class DataLoader(object):
         if not keep_local_file_after_download:
             os.remove(path)
 
-    def download_file_from_url(self, url: str, name: str, artist: str, item_url: str, song_type: str = 'Artist',
-                               song_image_url: str = None):
-        self.set_soup(url)
+    def download_file_from_url(self, song_details: dict = {}):
+        self.set_soup(song_details['url'])
 
-        if song_type.lower() == 'month':
+        if song_details['song_type'].lower() == 'month':
             source = self.__soup.find('div', id='nsmp3-player').find(class_='player-source')
         else:
             source = self.__soup.find('div', id='tsmp3-player').find(class_='player-source')
@@ -204,37 +199,38 @@ class DataLoader(object):
             song_genre = self.__soup.find('ul', class_='song_raw_data').select('li')[5].find(text=True,
                                                                                              recursive=False).strip()
 
-            if song_type.lower() == 'month':
-                directory = "{}/{}/{}".format(self.__download_dir, 'NewSinhalaMP3', artist)
-                s3_directory_format = "{}/{}".format('NewSinhalaMP3', artist)
+            if song_details['song_type'].lower() == 'month':
+                directory = "{}/{}/{}".format(self.__download_dir, 'NewSinhalaMP3', song_details['artist'])
+                s3_directory_format = "{}/{}".format('NewSinhalaMP3', song_details['artist'])
             else:
-                directory = "{}/{}/{}".format(self.__download_dir, 'TopSinhalaMP3', artist)
-                s3_directory_format = "{}/{}".format('TopSinhalaMP3', artist)
+                directory = "{}/{}/{}".format(self.__download_dir, 'TopSinhalaMP3', song_details['artist'])
+                s3_directory_format = "{}/{}".format('TopSinhalaMP3', song_details['artist'])
 
-            file_name = "{}/{}{}".format(directory, name, '.mp3')
-            s3_directory = "{}/{}{}".format(s3_directory_format, name, '.mp3')
+            file_name = "{}/{}{}".format(directory, song_details['name'], '.mp3')
+            s3_directory = "{}/{}{}".format(s3_directory_format, song_details['name'], '.mp3')
             s3_folder_image_directory = "{}/{}".format(s3_directory_format, 'folder.jpg')
 
             directory = os.path.expandvars(directory)
             file_name = os.path.expandvars(file_name)
         except:
-            print("Error occurred when downloading Song:", name)
+            print("Error occurred when downloading Song:", song_details['name'])
             return
 
         song_values = {
             'source_id': source_id,
             'artist_description': song_artist_details,
-            'artist_name': artist,
-            'item_url': item_url,
-            'song_name': name,
+            'artist_name': song_details['artist'],
+            'item_url': song_details['item_url'],
+            'song_name': song_details['name'],
             'song_url': source_link,
             'song_description': song_description,
             's3_directory': s3_directory,
             'path': file_name,
-            'type': song_type,
-            'image_url': song_image_url,
+            'type': song_details['song_type'],
+            'image_url': song_details['song_image_url'],
             's3_folder_image_directory': s3_folder_image_directory,
-            'directory': directory
+            'directory': directory,
+            'bar': song_details['bar']
         }
 
         self.__download_file(source_link, directory, file_name, song_values)
@@ -381,28 +377,23 @@ class DataLoader(object):
     def mp3_tag_update(self, path: str, song_values: dict):
         song_file = eyed3.load(path)
 
-        if cover_art_only_album:
-            cover_art_image_path = 'covers/generated/{}'.format(
-                sanitize_filename(
-                    "{}-{}{}".format(str(song_values['artist_name']).split("(")[0].strip(), "Musify", ".jpg")))
-        else:
-            cover_art_image_path = 'covers/generated/{}'.format(
-                sanitize_filename("{}-{}{}".format(str(song_values['song_name']).split("(")[0].strip(),
-                                                   str(song_values['artist_name']).split("(")[0].strip(), ".jpg")))
-
+        cover_art_image_path = get_cover_art_image_path(song_values)
         cover_art_path = os.path.join(os.path.dirname(__file__), cover_art_image_path)
 
         if cover_art_generation and (os.path.exists(cover_art_path) is False):
             if keep_cover_in_s3_bucket is True:
-                self.get_cover_art_from_s3(cover_art_path, song_values)
+                get_cover_art_from_s3(cover_art_path, song_values)
 
                 if os.path.exists(cover_art_path) is False:
-                    print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(song_values['artist_name']))
+                    bar = song_values['bar']
+
+                    print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(
+                        song_values['artist_name']))
                     song_values['image_url'] = input('>>> ')
-                    self.update_covers_config(song_values)
+                    update_covers_config(song_values)
                     generate_covers(song_values=song_values)
             else:
-                self.update_covers_config(song_values)
+                update_covers_config(song_values)
                 generate_covers(song_values=song_values)
 
         elif os.path.exists(cover_art_path):
@@ -436,79 +427,3 @@ class DataLoader(object):
 
             if cover_art_delete_after_attached and os.path.exists(cover_art_path) and (cover_art_only_album is False):
                 os.remove(cover_art_path)
-
-    def get_cover_art_from_s3(self, image_path, values):
-        print("Get image from S3 bucket")
-
-        try:
-            s3_folder_image_directory = values['s3_folder_image_directory']
-            session = boto3.session.Session()
-            client = session.client('s3',
-                                    endpoint_url=bucket_endpoint,
-                                    aws_access_key_id=access_key,
-                                    aws_secret_access_key=secret_access_key)
-
-            try:
-                if not os.path.exists(os.path.join(get_covers_root(), 'generated')):
-                    os.makedirs(os.path.join(get_covers_root(), 'generated'))
-
-                client.download_file(Bucket=bucket_name, Key=s3_folder_image_directory, Filename=image_path)
-            except ClientError as e:
-                print("Get image from S3 bucket. Image does not exists. Error: ", e)
-
-        except Exception as e:
-            print("Get image from S3 bucket. Error Occurred. Reason:\n", e)
-
-    def update_covers_config(self, song_values: dict):
-        current_path = os.path.abspath(os.path.dirname(__file__))
-
-        gradient_path = os.path.join(current_path, 'covers/images/gradient')
-        random_gradient = None
-        if os.path.exists(gradient_path):
-            gradient_count = len(
-                [name for name in os.listdir(gradient_path) if os.path.isfile(os.path.join(gradient_path, name))])
-            random_gradient = random.randint(1, gradient_count)
-            print("Random gradient chosen: {}, gradient count: {}".format(random_gradient, gradient_count))
-        if cover_art_only_album:
-            data = {
-                "cover": [
-                    {
-                        "bg-image": "artwork.jpg",
-                        "centre-text": True,
-                        "colour-gradient": "{}".format(random_gradient),
-                        "do-not-greyscale": True,
-                        "gradient-opacity": 30,
-                        "main-text": str(song_values['artist_name']).split("(")[0].strip(),
-                        "sub-text": "Musify",
-                        "sub-text-above": True,
-                        "logo-opacity": 70
-                    }
-                ],
-                "config": {
-                    "output-size": 800
-                }
-            }
-        else:
-            data = {
-                "cover": [
-                    {
-                        "bg-image": "artwork.jpg",
-                        "centre-text": True,
-                        "colour-gradient": "{}".format(random_gradient),
-                        "do-not-greyscale": True,
-                        "gradient-opacity": 30,
-                        "main-text": str(song_values['song_name']).split("(")[0].strip(),
-                        "sub-text": str(song_values['artist_name']).split("(")[0].strip(),
-                        "sub-text-above": True,
-                        "logo-opacity": 70
-                    }
-                ],
-                "config": {
-                    "output-size": 800
-                }
-            }
-
-        config_path = os.path.join(current_path, "covers/config.toml")
-
-        with open(config_path, "w") as toml_file:
-            toml.dump(data, toml_file)

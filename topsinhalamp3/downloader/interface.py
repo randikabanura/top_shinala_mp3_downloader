@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from alive_progress import alive_it, alive_bar
+
 from .covers.utils import get_covers_root
 from .states import *
 from .consts import *
@@ -359,16 +361,29 @@ class Interface(object):
         return songs_list
 
     def __download_songs(self, song_list: list = [], song_type: str = 'Artist', folder_prefix: str = ''):
-        for song in progressbar(song_list, redirect_stdout=True):
-            song_item = "{} {}".format(folder_prefix, song['item']).strip()
-            song_url = song['url']
-            song_name = song['song']
-            song_item_url = song['item_url']
-            song_image_url = song['image_url']
+        with alive_bar(len(song_list)) as bar:
+            for song in song_list:
+                song_item = "{} {}".format(folder_prefix, song['item']).strip()
+                song_url = song['url']
+                song_name = song['song']
+                song_item_url = song['item_url']
+                song_image_url = song['image_url']
 
-            print("Song download: Item:", song_item, "Song:", song_name)
-            if song_url is not None:
-                self.__data_loader.download_file_from_url(song_url, song_name, song_item, song_item_url, song_type, song_image_url)
+                bar.text(f'Song download: Item: {song_item} Song: {song_name}')
+                if song_url is not None:
+                    song_details = {
+                        'url': song_url,
+                        'name': song_name,
+                        'artist': song_item,
+                        'item_url': song_item_url,
+                        'song_type': song_type,
+                        'song_image_url': song_image_url,
+                        'bar': bar
+                    }
+
+                    self.__data_loader.download_file_from_url(song_details)
+
+                bar()
 
     def __redirect_to_function(self, cmd: str):
         cmd = cmd.strip()
