@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
+from .covers.utils import get_covers_root
 from .consts import *
 import shutil
 from urllib.error import URLError
@@ -137,7 +138,6 @@ class DataLoader(object):
         print('Upload to S3 bucket initiated')
 
         try:
-
             s3_directory = values['s3_directory']
             s3_folder_image_directory = values['s3_folder_image_directory']
             folder_image_directory = os.path.join(values['directory'], "folder.jpg")
@@ -326,7 +326,7 @@ class DataLoader(object):
         songs_name_list = self.__soup.find('ol', class_='list_of_songs').find_all('a', attrs={'class': None})
         songs_list = []
         if cover_art_generation:
-            if page == 1:
+            if page == 1 and (keep_cover_in_s3_bucket is False):
                 print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(artist))
                 image_url = input('>>> ')
         else:
@@ -393,8 +393,18 @@ class DataLoader(object):
         cover_art_path = os.path.join(os.path.dirname(__file__), cover_art_image_path)
 
         if cover_art_generation and (os.path.exists(cover_art_path) is False):
-            self.update_covers_config(song_values)
-            generate_covers(song_values=song_values)
+            if keep_cover_in_s3_bucket is True:
+                self.get_cover_art_from_s3(cover_art_path, song_values)
+
+                if os.path.exists(cover_art_path) is False:
+                    print("Please enter a url for a '{}' image (Otherwise default image will be used)".format(song_values['artist_name']))
+                    song_values['image_url'] = input('>>> ')
+                    self.update_covers_config(song_values)
+                    generate_covers(song_values=song_values)
+            else:
+                self.update_covers_config(song_values)
+                generate_covers(song_values=song_values)
+
         elif os.path.exists(cover_art_path):
             print("Cover Art already exists")
             song_directory = os.path.join(song_values['directory'], "folder.jpg")
@@ -426,6 +436,28 @@ class DataLoader(object):
 
             if cover_art_delete_after_attached and os.path.exists(cover_art_path) and (cover_art_only_album is False):
                 os.remove(cover_art_path)
+
+    def get_cover_art_from_s3(self, image_path, values):
+        print("Get image from S3 bucket")
+
+        try:
+            s3_folder_image_directory = values['s3_folder_image_directory']
+            session = boto3.session.Session()
+            client = session.client('s3',
+                                    endpoint_url=bucket_endpoint,
+                                    aws_access_key_id=access_key,
+                                    aws_secret_access_key=secret_access_key)
+
+            try:
+                if not os.path.exists(os.path.join(get_covers_root(), 'generated')):
+                    os.makedirs(os.path.join(get_covers_root(), 'generated'))
+
+                client.download_file(Bucket=bucket_name, Key=s3_folder_image_directory, Filename=image_path)
+            except ClientError as e:
+                print("Get image from S3 bucket. Image does not exists. Error: ", e)
+
+        except Exception as e:
+            print("Get image from S3 bucket. Error Occurred. Reason:\n", e)
 
     def update_covers_config(self, song_values: dict):
         current_path = os.path.abspath(os.path.dirname(__file__))

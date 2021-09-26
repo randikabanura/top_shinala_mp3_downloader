@@ -15,12 +15,13 @@ songs_per_page = 50
 
 # Download configs
 file_download_path = './downloads'
-reset_download_folders_on_startup = False
+reset_download_folders_on_startup = True
 update_mp3_tag = True
 force_downloadable = True
 cover_art_generation = True
 cover_art_only_album = True
 cover_art_delete_after_attached = True
+keep_cover_in_s3_bucket = True
 
 # Database configs
 database_enabled = False
