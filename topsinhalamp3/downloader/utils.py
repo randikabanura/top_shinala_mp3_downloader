@@ -65,7 +65,8 @@ def update_covers_config(song_values: dict):
                     "main-text": str(song_values['artist_name']).split("(")[0].strip(),
                     "sub-text": "Musify",
                     "sub-text-above": True,
-                    "logo-opacity": 70
+                    "logo-opacity": 100,
+                    "use-white-logo": True
                 }
             ],
             "config": {
