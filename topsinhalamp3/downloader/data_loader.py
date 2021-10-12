@@ -23,6 +23,8 @@ class DataLoader(object):
         soup.prettify()
         self.__soup = soup
         self.__download_dir = download_dir
+        self.session = None
+        self.client = None
 
     def set_soup(self, url: str):
         try:
@@ -67,13 +69,16 @@ class DataLoader(object):
 
             try:
                 if enabled_s3_upload:
-                    session = boto3.session.Session()
-                    client = session.client('s3',
-                                            endpoint_url=bucket_endpoint,
-                                            aws_access_key_id=access_key,
-                                            aws_secret_access_key=secret_access_key)
+                    if self.session is None:
+                        self.session = boto3.session.Session()
 
-                    client.head_object(Bucket=bucket_name, Key=values['s3_directory'])
+                    if self.client is None:
+                        self.client = self.session.client('s3',
+                                                endpoint_url=bucket_endpoint,
+                                                aws_access_key_id=access_key,
+                                                aws_secret_access_key=secret_access_key)
+
+                    self.client.head_object(Bucket=bucket_name, Key=values['s3_directory'])
                 else:
                     print("Request URL: ", url)
                     response = urllib2.urlopen(url)
@@ -138,17 +143,20 @@ class DataLoader(object):
             s3_folder_image_directory = values['s3_folder_image_directory']
             folder_image_directory = os.path.join(values['directory'], "folder.jpg")
 
-            session = boto3.session.Session()
-            client = session.client('s3',
-                                    endpoint_url=bucket_endpoint,
-                                    aws_access_key_id=access_key,
-                                    aws_secret_access_key=secret_access_key)
+            if self.session is None:
+                self.session = boto3.session.Session()
+
+            if self.client is None:
+                self.client = self.session.client('s3',
+                                                  endpoint_url=bucket_endpoint,
+                                                  aws_access_key_id=access_key,
+                                                  aws_secret_access_key=secret_access_key)
 
             try:
-                client.head_object(Bucket=bucket_name, Key=s3_directory)
+                self.client.head_object(Bucket=bucket_name, Key=s3_directory)
             except ClientError as e:
                 if e.response['Error']['Code'] == "404":
-                    client.upload_file(path, bucket_name, s3_directory)
+                    self.client.upload_file(path, bucket_name, s3_directory)
                     print('Upload to S3 successful')
                 else:
                     raise e
@@ -156,14 +164,14 @@ class DataLoader(object):
                 if force_downloadable is False:
                     print('File already exists')
                 else:
-                    client.upload_file(path, bucket_name, s3_directory)
+                    self.client.upload_file(path, bucket_name, s3_directory)
                     print('Upload to S3 successful')
 
             try:
-                client.head_object(Bucket=bucket_name, Key=s3_folder_image_directory)
+                self.client.head_object(Bucket=bucket_name, Key=s3_folder_image_directory)
             except ClientError as e:
                 if e.response['Error']['Code'] == "404":
-                    client.upload_file(folder_image_directory, bucket_name, s3_folder_image_directory)
+                    self.client.upload_file(folder_image_directory, bucket_name, s3_folder_image_directory)
                     print('Upload folder image to S3 successful')
                 else:
                     raise e
@@ -382,7 +390,7 @@ class DataLoader(object):
 
         if cover_art_generation and (os.path.exists(cover_art_path) is False):
             if keep_cover_in_s3_bucket is True:
-                get_cover_art_from_s3(cover_art_path, song_values)
+                get_cover_art_from_s3(cover_art_path, song_values, self.session, self.client)
 
                 if os.path.exists(cover_art_path) is False:
                     bar = song_values['bar']

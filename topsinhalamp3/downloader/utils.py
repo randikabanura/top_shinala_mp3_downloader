@@ -24,16 +24,19 @@ def get_cover_art_image_path(song_values=None):
     return cover_art_image_path
 
 
-def get_cover_art_from_s3(image_path, values):
+def get_cover_art_from_s3(image_path, values, session, client):
     print("Get image from S3 bucket")
 
     try:
         s3_folder_image_directory = values['s3_folder_image_directory']
-        session = boto3.session.Session()
-        client = session.client('s3',
-                                endpoint_url=bucket_endpoint,
-                                aws_access_key_id=access_key,
-                                aws_secret_access_key=secret_access_key)
+        if session is None:
+            session = boto3.session.Session()
+
+        if client is None:
+            client = session.client('s3',
+                                              endpoint_url=bucket_endpoint,
+                                              aws_access_key_id=access_key,
+                                              aws_secret_access_key=secret_access_key)
 
         if not os.path.exists(os.path.join(get_covers_root(), 'generated')):
             os.makedirs(os.path.join(get_covers_root(), 'generated'))
