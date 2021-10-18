@@ -414,6 +414,16 @@ class DataLoader(object):
             if song_file.tag is None:
                 song_file.initTag()
 
+            try:
+                if song_values['artist_name'].split(" ")[0] not in song_file.tag.artist:
+                    if song_values['artist_name'].split(" ")[0] is not None and song_values['artist_name'].split(" ")[0] != '':
+                        song_file.tag.artist = "{} and {}".format(song_values['artist_name'], song_file.tag.artist)
+                    else:
+                        song_file.tag.artist = song_values['artist_name']
+            except Exception as e:
+                print("Error occurred: ", e)
+
+
             song_file.tag.title = song_values['song_name']
             song_file.tag.album = song_values['artist_name']
             song_file.tag.album_artist = 'Various Artists' if str(song_values['type']).lower() == 'month' else \
