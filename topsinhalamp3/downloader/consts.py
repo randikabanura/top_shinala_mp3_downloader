@@ -11,7 +11,7 @@ top_25_month_url = 'https://www.newsinhalamp3.com/categories/top-25-new-sinhala-
 new_sinhala_month_url = 'https://www.newsinhalamp3.com/categories/new-sinhala-mp3-songs.php'
 artist_letter_based_regex = r"^[a-zA-Z]{1}$"
 artists_per_page = 25
-songs_per_page = 50
+songs_per_page = 25
 
 # Download configs
 file_download_path = './downloads'
