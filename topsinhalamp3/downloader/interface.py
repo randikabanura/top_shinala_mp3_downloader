@@ -20,6 +20,7 @@ class Interface(object):
         self.__cmds = []
         self.__page_id = 1
         self.__artist_name_letter = None
+        self.__artist_song_selector = False
 
     def __print_initial_msg(self, cmd='none'):
         print("")
@@ -28,8 +29,8 @@ class Interface(object):
         print("Anytime, if you want to go back enter 99 and if you want to start from the beginning enter 999..")
         print("Also you can exit the software by typing quit...")
         print(
-            "Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) All Artists \n\t4) Top 25 by "
-            "Month \n\t5) All Top 25 by Month \n\t6) New by Month \n\t7) All New by Month")
+            "Do you need to search by:\n\t1) Artist Letter \n\t2) Artist Name \n\t3) Artist Song Name \n\t4) All Artists \n\t5) Top 25 by "
+            "Month \n\t6) All Top 25 by Month \n\t7) New by Month \n\t8) All New by Month")
         print("Please enter a number below")
         self.__state = INITIAL_STATE
 
@@ -53,20 +54,24 @@ class Interface(object):
             print("Enter the first letter of the Artists")
             self.__state = ARTIST_NAME_ENTERED
         elif cmd in '3)':
+            print("Enter the first letter of the Artists")
+            self.__artist_song_selector = True
+            self.__state = ARTIST_NAME_ENTERED
+        elif cmd in '4)':
             self.__state = ALL_DOWNLOAD
             self.__artist_all_download('')
-        elif cmd in '4)':
+        elif cmd in '5)':
             print("Enter the first letter of the Month")
             self.__state = TOP_25_BY_MONTH_ENTERED
             self.__top_25_month_results('')
-        elif cmd in '5)':
+        elif cmd in '6)':
             self.__state = ALL_TOP_25_BY_MONTH
             self.__top_25_all_download('')
-        elif cmd in '6)':
+        elif cmd in '7)':
             print("Enter the first letter of the Month")
             self.__state = NEW_BY_MONTH_ENTERED
             self.__new_month_results('')
-        elif cmd in '7)':
+        elif cmd in '8)':
             self.__state = ALL_NEW_BY_MONTH
             self.__new_all_download('')
         else:
@@ -156,7 +161,6 @@ class Interface(object):
             return
 
         songs_list = self.__get_songs(artist_list)
-
         self.__download_songs(songs_list)
         self.__handle_back('999', self.__print_initial_msg)
 
@@ -209,10 +213,31 @@ class Interface(object):
 
         songs_list = self.__get_songs(artist_list, True, artist_index)
 
-        self.__download_songs(songs_list)
+        if self.__artist_song_selector:
+            print("Select a number for the Song")
+            for song in songs_list:
+                print("{}) {} - {}".format(song['index'], song['song'], song['item']))
 
-        self.__artist_name_letter = None
-        self.__handle_back('999', self.__print_initial_msg)
+            try:
+                cmd = input('>>> ').lower()
+                songs_list = [songs_list[int(cmd) - 1]]
+            except Exception as e:
+                print(e)
+                self.__artist_name_letter = None
+                self.__artist_song_selector = False
+                self.__handle_back('999', self.__print_initial_msg)
+                return
+
+            self.__download_songs(songs_list)
+
+            self.__artist_name_letter = None
+            self.__artist_song_selector = False
+            self.__handle_back('999', self.__print_initial_msg)
+        else:
+            self.__download_songs(songs_list)
+
+            self.__artist_name_letter = None
+            self.__handle_back('999', self.__print_initial_msg)
 
     def __top_25_month_results(self, cmd):
         print("Month based show results")
