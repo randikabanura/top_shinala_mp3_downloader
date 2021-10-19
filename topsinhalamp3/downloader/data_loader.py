@@ -415,7 +415,7 @@ class DataLoader(object):
                 song_file.initTag()
 
             try:
-                if song_values['artist_name'].split(" ")[0] not in song_file.tag.artist:
+                if str(song_values['type']).lower() != 'month' and song_values['artist_name'].split(" ")[0] not in song_file.tag.artist:
                     if song_values['artist_name'].split(" ")[0] is not None and song_values['artist_name'].split(" ")[0] != '':
                         song_file.tag.artist = "{} and {}".format(song_values['artist_name'], song_file.tag.artist)
                     else:
